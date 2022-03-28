@@ -4,13 +4,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
 import PIL
+import timeit
 
-name = "car6"
+name = "car1"
 name_open = name+".jpg"
 
 #reading in the input image
 plate = cv2.imread("/home/asoria/Documents/zita9999/"+name_open)
 
+""""
 #function that shows the image
 def display(img, destination = "/home/asoria/Documents/zita9999/"+name+"_processed.png"):
     fig = plt.figure(figsize = (12,10))
@@ -22,17 +24,19 @@ def display(img, destination = "/home/asoria/Documents/zita9999/"+name+"_process
 #need to change color of picture from BGR to RGB
 plate = cv2.cvtColor(plate, cv2.COLOR_BGR2RGB)
 #display(plate, destination = "/home/asoria/Documents/zita9999/"+name+"_rgb.png")
+"""
 
 #Cascade Classifier where our hundres of samples of license plates are
 plate_cascade = cv2.CascadeClassifier('/home/asoria/Documents/zita9999/haarcascades/haarcascade_russian_plate_number.xml')
 
-
+""""
 def detect_plate(img):
     
     plate_img = plate.copy()
     
     #gets the points of where the classifier detects a plate
-    plate_rects = plate_cascade.detectMultiScale(plate_img, scaleFactor = 1.2, minNeighbors = 10)
+    #YOU ARE MODIFYING THIS LINE
+    plate_rects = plate_cascade.detectMultiScale(plate_img, scaleFactor = 1.1, minNeighbors = 2)
 
     #draws the rectangle around it
     for (x,y,w,h) in plate_rects:
@@ -41,16 +45,48 @@ def detect_plate(img):
     return plate_img
 
 result2 = detect_plate(plate)
-display(result2, destination = "/home/asoria/Documents/zita9999/"+name+"_rectangle.png")
+#display(result2, destination = "/home/asoria/Documents/zita9999/"+name+"_scale2_1_neig2.png")
+"""
 
 
+def detect_plate3(img):
+    
+    plate_img = plate.copy()
+    
+    #gets the points of where the classifier detects a plate
+    #YOU ARE MODIFYING THIS LINE
+    starttime5 = timeit.default_timer()
+
+    plate_rects, rejectLevels, levelWeights  = plate_cascade.detectMultiScale3(plate_img, scaleFactor = 1.1, minNeighbors = 2, \
+        outputRejectLevels = True)	
+    diff_time5 = timeit.default_timer() - starttime5
+
+
+    #draws the rectangle around it
+    i=0
+    for (x,y,w,h) in plate_rects:
+        i=i+1
+        cv2.rectangle(plate_img, (x,y), (x+w, y+h), (255,0,0), 5)
+        a=int(y+h/2)
+        cv2.putText(plate_img,str(i),(x,a), cv2.FONT_ITALIC, 0.9,(0,0,255),2,cv2.LINE_AA)
+    
+    return plate_img, rejectLevels, levelWeights, diff_time5
+
+result5, rejectLevels, levelWeights5, diff_time5 = detect_plate3(plate)
+print("levelWeights for confidence = ", levelWeights5)
+print('rejectLevels for Trainig Steps = ', rejectLevels)
+print("The time difference for detectMultiScale3 is :", diff_time5)
+display(result5, destination = "/home/asoria/Documents/zita9999/"+name+"_levelW.png")
+
+
+"""
 #detects the plate and zooms in on it
 def detect_zoom_plate(img, kernel):
     
     plate_img = img.copy()
     
     #gets the points of where the classifier detects a plate
-    plate_rects = plate_cascade.detectMultiScale(plate_img, scaleFactor = 1.2, minNeighbors = 10) #maxSize = (100,100))
+    plate_rects = plate_cascade.detectMultiScale(plate_img, scaleFactor =1.9, minNeighbors = 2) #maxSize = (100,100))
     
     for (x,y,w,h) in plate_rects:
         x_offset = x
@@ -88,6 +124,7 @@ def detect_zoom_plate(img, kernel):
             
         
     return plate_img
+"""
 
 #same function as above just blurs the license plate instead
 def detect_blur(img):
