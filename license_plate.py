@@ -1,10 +1,20 @@
 # -*- coding: utf-8 -*-
+from cProfile import Profile
+import profile
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
 import PIL
 import timeit
+from time import process_time
+import psutil
+from psutil import cpu_percent
+from memory_profiler import profile
+
+
+
+print('memory usage = ',psutil.Process().memory_info().rss / (1024 * 1024),'MBytes')
 
 name = "car1"
 name_open = name+".jpg"
@@ -12,15 +22,15 @@ name_open = name+".jpg"
 #reading in the input image
 plate = cv2.imread("/home/asoria/Documents/zita9999/"+name_open)
 
-""""
+
 #function that shows the image
 def display(img, destination = "/home/asoria/Documents/zita9999/"+name+"_processed.png"):
     fig = plt.figure(figsize = (12,10))
     ax = fig.add_subplot(111)
     ax.imshow(img,cmap = 'gray')
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     cv2.imwrite(destination, img)
 
+""""
 #need to change color of picture from BGR to RGB
 plate = cv2.cvtColor(plate, cv2.COLOR_BGR2RGB)
 #display(plate, destination = "/home/asoria/Documents/zita9999/"+name+"_rgb.png")
@@ -48,20 +58,20 @@ result2 = detect_plate(plate)
 #display(result2, destination = "/home/asoria/Documents/zita9999/"+name+"_scale2_1_neig2.png")
 """
 
-
+#@profile
 def detect_plate3(img):
     
     plate_img = plate.copy()
     
-    #gets the points of where the classifier detects a plate
-    #YOU ARE MODIFYING THIS LINE
     starttime5 = timeit.default_timer()
+    #starttime5  = process_time() 
 
-    plate_rects, rejectLevels, levelWeights  = plate_cascade.detectMultiScale3(plate_img, scaleFactor = 1.1, minNeighbors = 2, \
+    plate_rects, rejectLevels, levelWeights  = plate_cascade.detectMultiScale3(plate_img, scaleFactor = 1.3, minNeighbors = 3, \
         outputRejectLevels = True)	
+
     diff_time5 = timeit.default_timer() - starttime5
-
-
+    #diff_time5 = process_time() - starttime5
+    
     #draws the rectangle around it
     i=0
     for (x,y,w,h) in plate_rects:
@@ -70,9 +80,10 @@ def detect_plate3(img):
         a=int(y+h/2)
         cv2.putText(plate_img,str(i),(x,a), cv2.FONT_ITALIC, 0.9,(0,0,255),2,cv2.LINE_AA)
     
-    return plate_img, rejectLevels, levelWeights, diff_time5
+    return plate_img, rejectLevels, levelWeights, diff_time5, plate_rects
 
-result5, rejectLevels, levelWeights5, diff_time5 = detect_plate3(plate)
+result5, rejectLevels, levelWeights5, diff_time5,  plate_rects5 = detect_plate3(plate)
+
 print("levelWeights for confidence = ", levelWeights5)
 print('rejectLevels for Trainig Steps = ', rejectLevels)
 print("The time difference for detectMultiScale3 is :", diff_time5)
@@ -126,14 +137,12 @@ def detect_zoom_plate(img, kernel):
     return plate_img
 """
 
-#same function as above just blurs the license plate instead
-def detect_blur(img):
+#blurs the license plate
+@profile
+def detect_blur(img, plate_rects):
     
     plate_img = img.copy()
-    
-    
-    plate_rects = plate_cascade.detectMultiScale(plate_img, scaleFactor = 1.2, minNeighbors = 3)
-    
+        
     for (x,y,w,h) in plate_rects:
         x_offset = x
         y_offset = y
@@ -142,25 +151,35 @@ def detect_blur(img):
         y_end = y+h
         
         zoom_img = plate_img[y_offset:y_end, x_offset:x_end]
-        #blur function
+
+        #starttime_blur = timeit.default_timer()
+        starttime_blur = process_time() 
+        cpu_usage = cpu_percent(0)
         zoom_img = cv2.medianBlur(zoom_img,15)
+        #delay_blur = timeit.default_timer() - starttime_blur
+        delay_blur = process_time() - starttime_blur
+        
+
+
         plate_img[y_offset:y_end, x_offset:x_end] = zoom_img
         
-        for (x,y,w,h) in plate_rects:
-            cv2.rectangle(plate_img, (x,y), (x+w, y+h), (255,0,0), 5)
         
-    return plate_img
-    
+    return plate_img, delay_blur, cpu_usage
+
+""""
 #matrix needed to sharpen the image
 kernel = np.array([[-1,-1,-1],
                    [-1,9,-1],
                    [-1,-1,-1]])
     
-result3 = detect_zoom_plate(plate, kernel)
+#result3 = detect_zoom_plate(plate, kernel)
 #display(result3, destination = "/home/asoria/Documents/zita9999/"+name+"_zoomed.png")
+"""
 
-result4 = detect_blur(plate)
-#display(result4, destination = "/home/asoria/Documents/zita9999/"+name+"_blurred.png")
+result4, delay_blur, cpu_usage = detect_blur(plate, plate_rects5)
+display(result4, destination = "/home/asoria/Documents/zita9999/"+name+"_blurred.png")
+print("The time difference for detectBlur is :", delay_blur)
+#print("The cpu usage for detectBlur is :", cpu_usage)
 
 
 
