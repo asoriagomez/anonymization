@@ -3,8 +3,8 @@ import cv2
 import numpy as np
 
 
-name = "car1"
-name_open = name+".jpg"
+name = "car1_blurred"
+name_open = name+".png"
 def log_avg_var_luminance(name_open):
         
     # Read in BGR

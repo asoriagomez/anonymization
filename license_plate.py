@@ -58,7 +58,7 @@ result2 = detect_plate(plate)
 #display(result2, destination = "/home/asoria/Documents/zita9999/"+name+"_scale2_1_neig2.png")
 """
 
-#@profile
+@profile
 def detect_plate3(img):
     
     plate_img = plate.copy()
@@ -66,7 +66,7 @@ def detect_plate3(img):
     starttime5 = timeit.default_timer()
     #starttime5  = process_time() 
 
-    plate_rects, rejectLevels, levelWeights  = plate_cascade.detectMultiScale3(plate_img, scaleFactor = 1.3, minNeighbors = 3, \
+    plate_rects, rejectLevels, levelWeights  = plate_cascade.detectMultiScale3(plate_img, scaleFactor = 1.1, minNeighbors = 3, \
         outputRejectLevels = True)	
 
     diff_time5 = timeit.default_timer() - starttime5
@@ -79,7 +79,7 @@ def detect_plate3(img):
         cv2.rectangle(plate_img, (x,y), (x+w, y+h), (255,0,0), 5)
         a=int(y+h/2)
         cv2.putText(plate_img,str(i),(x,a), cv2.FONT_ITALIC, 0.9,(0,0,255),2,cv2.LINE_AA)
-    
+    print(plate_rects) 
     return plate_img, rejectLevels, levelWeights, diff_time5, plate_rects
 
 result5, rejectLevels, levelWeights5, diff_time5,  plate_rects5 = detect_plate3(plate)
@@ -137,6 +137,7 @@ def detect_zoom_plate(img, kernel):
     return plate_img
 """
 
+"""
 #blurs the license plate
 @profile
 def detect_blur(img, plate_rects):
@@ -166,7 +167,8 @@ def detect_blur(img, plate_rects):
         
     return plate_img, delay_blur, cpu_usage
 
-""""
+"""
+
 #matrix needed to sharpen the image
 kernel = np.array([[-1,-1,-1],
                    [-1,9,-1],
@@ -177,11 +179,10 @@ kernel = np.array([[-1,-1,-1],
 """
 
 result4, delay_blur, cpu_usage = detect_blur(plate, plate_rects5)
-display(result4, destination = "/home/asoria/Documents/zita9999/"+name+"_blurred.png")
+display(result4, destination = "/home/asoria/Documents/zita9999/"+name+"_blurredX.png")
 print("The time difference for detectBlur is :", delay_blur)
 #print("The cpu usage for detectBlur is :", cpu_usage)
-
-
+"""
 
 """
 #### video
