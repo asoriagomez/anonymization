@@ -13,9 +13,6 @@ from psutil import cpu_percent
 from memory_profiler import profile
 
 
-
-print('memory usage = ',psutil.Process().memory_info().rss / (1024 * 1024),'MBytes')
-
 name = "car1"
 name_open = name+".jpg"
 
