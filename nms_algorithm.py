@@ -11,9 +11,6 @@ def are_overlapping(rect1, rect2):
     - Be greater than a threshold defined as 0.5 of the maximum possible overlap area (one inside the other)
     """
 
-    rect1 = [ 450 , 421 ,1050 , 350]
-    rect2 = [ 663 , 526 , 324 , 108]
-
     xstart1 = rect1[0]
     xend1 = rect1[0]+rect1[2]
     ystart1 = rect1[1]
@@ -27,7 +24,7 @@ def are_overlapping(rect1, rect2):
     yend2 = rect2[1]+rect2[3]
 
     area2 = rect2[2]*rect2[3]
-
+    print(xstart1)
     xstartmin = min(xstart1, xstart2)
     xstartmax = max(xstart1, xstart2)
     xendmin = min(xend1, xend2)
@@ -37,17 +34,18 @@ def are_overlapping(rect1, rect2):
     ystartmax = max(ystart1, ystart2)
     yendmin = min(yend1, yend2)
     yendmax = max(yend1, yend2)
-
+    
     xoverlap = xendmin - xstartmax
     yoverlap = yendmin - ystartmax
-
+    print(xoverlap)
+    print(yoverlap)
     bothpositive = (xoverlap>0) and (yoverlap>0)
 
     overlaparea = xoverlap*yoverlap
     threshold = 0.5*min(area1, area2)/max(area1, area2)
     overlapping_areas = overlaparea>=threshold
 
-    overlapping = bothpositive and overlapping_areas
+    overlapping = bothpositive & overlapping_areas
     return overlapping
 
 
@@ -84,6 +82,7 @@ def NMS(plate_rects, levelWeights):
 
     keep.append(rects[0])
     rects.remove(rects[0])
+
     while len(rects)>0:
         ref_rect = keep[-1]
         for r in rects:
@@ -119,5 +118,6 @@ levelWeights =  [1.46363363,
 3.3027389]
 
 keep = NMS(plate_rects, levelWeights)
+
 
 display(plate, keep)
