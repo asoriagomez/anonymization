@@ -87,9 +87,9 @@ def calculate_avg_sq_gradients(filename,plate_rects = []):
 # ------------------------------------------------------------------------------------------------------------- #
 # Trying out the code with different parameters 
 
-name = "car1_blurred.png"
+name = "car1.jpg"
 filename = "/home/asoria/Documents/zita9999/"+name
-plate_rects = [[691,530,299,100],[36,551,156,52],[498,443,980,327]]
+#plate_rects = [[691,530,299,100],[36,551,156,52],[498,443,980,327]]
 #plate_rects = []
 
-calculate_avg_sq_gradients(filename, plate_rects)
+calculate_avg_sq_gradients(filename)
