@@ -24,7 +24,6 @@ def are_overlapping(rect1, rect2):
     yend2 = rect2[1]+rect2[3]
 
     area2 = rect2[2]*rect2[3]
-    print(xstart1)
     xstartmin = min(xstart1, xstart2)
     xstartmax = max(xstart1, xstart2)
     xendmin = min(xend1, xend2)
@@ -37,8 +36,7 @@ def are_overlapping(rect1, rect2):
     
     xoverlap = xendmin - xstartmax
     yoverlap = yendmin - ystartmax
-    print(xoverlap)
-    print(yoverlap)
+
     bothpositive = (xoverlap>0) and (yoverlap>0)
 
     overlaparea = xoverlap*yoverlap
