@@ -8,14 +8,25 @@ from skimage.util import img_as_ubyte
 import warnings
 warnings.filterwarnings('ignore')
 
-#compute sharpness as the average of the gradients in 2D
-#it is a naive approach but at least works
 
-name = "car1_blurred.png"
-filename = "/home/asoria/Documents/zita9999/"+name
 
-def calculate_sharpness(array):
-    "input a np.int32 array which can be a piece of an image in grayscale"
+# ----------------------------------------------------------------------------------------------------------------------------
+# AVERAGE OF SQUARED GRADIENTS "
+# compute sharpness as the average of the gradients in 2D
+# it is a naive approach but at least works
+
+
+def aux_calculate_sharpness(array, title):
+    """
+    Inputs
+    - np.int32 array which can be (a piece of) an image in grayscale
+    - String to put as a title for the visualization
+
+    Outputs:
+    - Average of squared gradients of the grayscale array
+    - Visualization of the gradients of the array
+    """
+    
     gy, gx = np.gradient(array)
     gnorm = np.sqrt(gx**2 + gy**2)
     sharpness = np.average(gnorm)
@@ -27,30 +38,36 @@ def calculate_sharpness(array):
     plt.imshow(cat_sharpness, cmap="viridis")
     plt.axis('off')
     plt.colorbar()
-    plt.title(name)
+    plt.title(title)
     plt.show()
     return sharpness
 
-#calculate_sharpness(filename)
 
-
-plate_rects = [[691,530,299,100],[36,551,156,52],[498,443,980,327]]
-"""
-plate_rects = [[1711 , 233 , 158 ,  53],
- [1688 , 235 , 129  , 43],
- [ 450 , 421 ,1050 , 350],
- [ 503 , 587  , 73 ,  24],
- [ 663 , 526  ,324 , 108],
- [  26 , 552  ,178 ,  59]]
-"""
-
-def calc_sharpness_image(filename, plate_rects):
+def calculate_avg_sq_gradients(filename,plate_rects = []):
+    """
+    Inputs:
+    - Path to an image (compulsory)
+    - Array with detected plates (optional)
+    
+    Outputs:
+    - Blue-greenish images for visualization which you should go closing to continue running the algorithm
+    - Array with sharpness for each license plate, or whole image if none was provided
+    """
 
     im = Image.open(filename).convert('L') # to grayscale
     array_im = np.asarray(im, dtype=np.int32)
 
+    if len(plate_rects) == 0:
+        print('Empty plate_rects, calculate ASG for whole image')
+        plate_rects = [(0,0,array_im.shape[-1],array_im.shape[0])]
 
+    else:
+        print('Calculate sharpness for each blurred rectangle')
+
+    all_sharpness = []
+    nsec = 0
     for (x,y,w,h) in plate_rects:
+        nsec+=1
         print("x=",x,"y=",y,"w=", w, "h=",h)
         x_offset = x
         y_offset = y
@@ -60,10 +77,19 @@ def calc_sharpness_image(filename, plate_rects):
         
         #getting the points that show the license plate
         array_section = array_im[y_offset:y_end, x_offset:x_end]
-        sharpness = calculate_sharpness(array_section)
-        print(sharpness)
-        
-"You should go closing the images that pop up in order to continue running the algorithm"
-# It is lame but I will improve it for more images, this is just a simple measure of 
-# sharpness of the detected plates
-calc_sharpness_image(filename, plate_rects)
+        sharpness = aux_calculate_sharpness(array_section,name+' section: '+str(nsec))
+        all_sharpness.append(sharpness)
+        print(all_sharpness)
+    return all_sharpness
+
+
+
+# ------------------------------------------------------------------------------------------------------------- #
+# Trying out the code with different parameters 
+
+name = "car1_blurred.png"
+filename = "/home/asoria/Documents/zita9999/"+name
+plate_rects = [[691,530,299,100],[36,551,156,52],[498,443,980,327]]
+#plate_rects = []
+
+calculate_avg_sq_gradients(filename, plate_rects)
