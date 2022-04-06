@@ -89,7 +89,13 @@ def calculate_avg_sq_gradients(filename,plate_rects = []):
 
 name = "car1.jpg"
 filename = "/home/asoria/Documents/zita9999/"+name
-#plate_rects = [[691,530,299,100],[36,551,156,52],[498,443,980,327]]
+plate_rects = [[1688 , 235 , 129  , 43],
+ [1711 , 233 , 158  , 53],
+ [ 450 , 421 , 1050 , 350],
+ [ 503 , 587  , 73 ,  24],
+ [ 663 , 526 , 324 , 108],
+ [  26 , 552 , 178 ,  59]]
+ 
 #plate_rects = []
 
-calculate_avg_sq_gradients(filename)
+calculate_avg_sq_gradients(filename, plate_rects)

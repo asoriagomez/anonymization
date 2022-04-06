@@ -37,3 +37,4 @@ name_open = name+".jpg"
 filename = "/home/asoria/Documents/zita9999/"+name_open
 
 coordis = get_coordinates(filename)
+print(coordis)
