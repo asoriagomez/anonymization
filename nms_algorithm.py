@@ -40,7 +40,7 @@ def are_overlapping(rect1, rect2):
     bothpositive = (xoverlap>0) and (yoverlap>0)
 
     overlaparea = xoverlap*yoverlap
-    threshold = 0.5*min(area1, area2)/max(area1, area2)
+    threshold = 0.5*min(area1, area2)
     overlapping_areas = overlaparea>=threshold
 
     overlapping = bothpositive & overlapping_areas
@@ -116,6 +116,5 @@ levelWeights =  [1.46363363,
 3.3027389]
 
 keep = NMS(plate_rects, levelWeights)
-
 
 display(plate, keep)
