@@ -29,12 +29,13 @@ def get_coordinates(filename):
     cv2.waitKey(0) #press any key to stop the algorithm
     return left_clicks
 
+"""
 # -------------------------------------------------------------------------------
 # Try algorithm with some parameters
-
 name = "car1"
 name_open = name+".jpg"
 filename = "/home/asoria/Documents/zita9999/"+name_open
 
 coordis = get_coordinates(filename)
 print(coordis)
+"""

@@ -3,6 +3,7 @@ from operator import itemgetter
 import collections
 import cv2
 import matplotlib.pyplot as plt
+from license_plate import display
 
 def are_overlapping(rect1, rect2):
     """
@@ -47,22 +48,6 @@ def are_overlapping(rect1, rect2):
     return overlapping
 
 
-def display(img, keep, destination = "/home/asoria/Documents/zita9999/nms.png"):
-    """
-    Auxiliar method to display an image
-    """
-    i=0
-    for (x,y,w,h) in keep:
-        i=i+1
-        cv2.rectangle(plate, (x,y), (x+w, y+h), (255,0,0), 5)
-        a=int(y+h/2)
-        cv2.putText(plate,str(i),(x,a), cv2.FONT_ITALIC, 0.9,(0,0,255),2,cv2.LINE_AA)
-    fig = plt.figure(figsize = (12,10))
-    ax = fig.add_subplot(111)
-    ax.imshow(img,cmap = 'gray')
-    cv2.imwrite(destination, img)
-
-
 def NMS(plate_rects, levelWeights):
     """
     Inputs:
@@ -71,6 +56,10 @@ def NMS(plate_rects, levelWeights):
     Outputs:
     - filters duplicate detections
     """
+    if len(plate_rects)!=0:
+        plate_rects = plate_rects.tolist()
+    else:
+        return []
     both_lists = list(zip(levelWeights, plate_rects))
     sorted_lists = sorted(both_lists, reverse = True, key=lambda x: x[0])
 
@@ -89,12 +78,11 @@ def NMS(plate_rects, levelWeights):
         if len(rects)>0:
             keep.append(rects[0])
 
-    print(keep)
     return keep
 
 # ----------------------------------------------------------------------------------------------------------
 # Trying the algorithms with some parameters
-
+"""
 name = "car1"
 name_open = name+".jpg"
 filename = "/home/asoria/Documents/zita9999/"+name_open
@@ -108,6 +96,8 @@ plate_rects = [[1688 , 235 , 129  , 43],
  [ 663 , 526 , 324 , 108],
  [  26 , 552 , 178 ,  59]]
 
+
+
 levelWeights =  [1.46363363,
 0.51568082,
 1.35041222,
@@ -117,4 +107,5 @@ levelWeights =  [1.46363363,
 
 keep = NMS(plate_rects, levelWeights)
 
-display(plate, keep)
+display(plate, destination = "/home/asoria/Documents/zita9999/kk.png", title='kk', keep = keep)
+"""
