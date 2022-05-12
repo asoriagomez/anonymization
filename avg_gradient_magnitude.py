@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from skimage.morphology import disk
 from skimage.filters.rank import gradient
 from skimage.util import img_as_ubyte
-
+import cv2
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -35,7 +35,7 @@ def aux_calculate_sharpness(array, title):
     selection_element = disk(2) # matrix of n pixels with a disk shape
     cat_sharpness = gradient(array, selection_element)
 
-    plt.imshow(cat_sharpness, cmap="viridis")
+    plt.imshow(cat_sharpness)
     plt.axis('off')
     plt.colorbar()
     plt.title(title)
@@ -77,6 +77,8 @@ def calculate_avg_sq_gradients(filename,plate_rects = []):
         
         #getting the points that show the license plate
         array_section = array_im[y_offset:y_end, x_offset:x_end]
+        plt.imshow(array_section, cmap='gray')
+        plt.show()
         sharpness = aux_calculate_sharpness(array_section,name+' section: '+str(nsec))
         all_sharpness.append(sharpness)
         print(all_sharpness)
@@ -87,7 +89,7 @@ def calculate_avg_sq_gradients(filename,plate_rects = []):
 # ------------------------------------------------------------------------------------------------------------- #
 # Trying out the code with different parameters 
 
-name = "car1.jpg"
+name = "car1.jpg"#_blurredX_1.1_nei_3.png"
 filename = "/home/asoria/Documents/zita9999/"+name
 plate_rects = [[1688 , 235 , 129  , 43],
  [1711 , 233 , 158  , 53],

@@ -41,7 +41,7 @@ def display(image, destination, title='Figure', keep = []):
     show = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     ax.imshow(show,cmap = 'gray')
     plt.title(title)
-    #plt.show()
+    plt.show()
     cv2.imwrite(destination, img)
 
 #@profile 
@@ -111,26 +111,46 @@ def detect_blur(img, plate_rects):
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Testing the methods with some parameters
-"""
+
 name = "car1"
 name_open = name+".jpg"
 filename = "/home/asoria/Documents/zita9999/"+name_open
 
+filename2 = "/home/asoria/Documents/zita9999/ID1055745/Image_000155.jpg"
 plate = cv2.imread(filename)
 scaleF = 1.1
 minNei = 3
 
 result5, rejectLevels, levelWeights5, diff_time5,  plate_rects5 = detect_plate3(plate, scaleF, minNei)
 
-#print("levelWeights for confidence = ", levelWeights5)
+print("plate_rects5 = ", plate_rects5)
+print('levelWeights for confidence = ', levelWeights5)
 #print('rejectLevels for Trainig Steps = ', rejectLevels)
 #print("The time difference for detectMultiScale3 is :", diff_time5)
 display(result5, destination = "/home/asoria/Documents/zita9999/"+name+"_confusion_sf_"+str(scaleF)+"_nei_"+str(minNei)+".png", title = 'detected: sF='+str(scaleF)+", minNei="+str(minNei))
 
 result4, delay_blur, cpu_usage = detect_blur(plate, plate_rects5)
-display(result4, destination = "/home/asoria/Documents/zita9999/"+name+"_blurredX_"+str(scaleF)+"_nei_"+str(minNei)+".png")
+display(result4, destination = "/home/asoria/Documents/zita9999/"+name+"_blurredX_"+str(scaleF)+"_nei_"+str(minNei)+".png" )
 print("The time difference for detectBlur is :", delay_blur)
 #print("The cpu usage for detectBlur is :", cpu_usage)
 
-"""
+
+i=0
+for (x,y,w,h) in plate_rects5:
+    i+=1
+    x_offset = x
+    y_offset = y
+
+    x_end = x+w
+    y_end = y+h
+
+    zoom_img = result4[y_offset:y_end, x_offset:x_end]
+
+    plt.imshow(zoom_img)
+    cv2.imwrite('/home/asoria/Documents/zita9999/detected_plates_graycar/after_blurring/Figure_'+str(i)+'.png', zoom_img)
+    plt.show()
+
+
+
+
 

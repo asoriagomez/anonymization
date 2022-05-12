@@ -18,4 +18,5 @@ def display(img, destination = "/home/asoria/Documents/zita9999/"+name+"_process
 
 
 #Cascade Classifier where our hundres of samples of license plates are
-plate_cascade = cv2.CascadeClassifier('/home/asoria/Documents/zita9999/haarcascades/haarcascade_russian_plate_number.xml')
+plate_cascade = cv2.CascadeClassifier('/home/asoria/Documents/zita9999/License-Plates-and-Computer-Vision/data/cascade.xml')
+plate_rects, rejectLevels, levelWeights  = plate_cascade.detectMultiScale3(plate, scaleFactor = 1.1, minNeighbors = 3, outputRejectLevels = True)	

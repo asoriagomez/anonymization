@@ -1,0 +1,10 @@
+pos/img1.jpg 1 520 257 115 45
+pos/img2.jpg 1 631 208 131 49 
+pos/img3.jpg 1 681 256 148 63
+pos/img4.jpg 1 627 216 130 62
+pos/img5.jpg 1 883 167 179 50 
+pos/img6.jpg 1 1066 225 119 80
+pos/img7.jpg 1 803 165 111 55
+pos/img8.jpg 1 830 309 126 37
+pos/img9.jpg 1 671 269 187 60
+pos/img10.jpg 1 823 225 182 51

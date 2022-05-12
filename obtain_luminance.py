@@ -71,7 +71,7 @@ def log_avg_var_luminance(filename,plate_rects = []):
 # ------------------------------------------------------------------------------------------------------------- #
 # Trying out the code with different parameters 
 
-name = "car1.jpg"
+name = "car1_blurredX_1.1_nei_3.png"
 filename = "/home/asoria/Documents/zita9999/"+name
 plate_rects = [[1688 , 235 , 129  , 43],
  [1711 , 233 , 158  , 53],
@@ -79,5 +79,5 @@ plate_rects = [[1688 , 235 , 129  , 43],
  [ 503 , 587  , 73 ,  24],
  [ 663 , 526 , 324 , 108],
  [  26 , 552 , 178 ,  59]]
-all_luminances = log_avg_var_luminance(filename, plate_rects)
-print(all_luminances)
+all_luminances = log_avg_var_luminance(filename)#, plate_rects)
+print('blurred=',all_luminances)
