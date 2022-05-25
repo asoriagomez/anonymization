@@ -87,7 +87,8 @@ def detect_plate3(img, scaleF = 1.1, minNei = 3):
 
 #@profile
 def detect_blur(img, plate_rects):
-    
+    delay_blur = 0
+    cpu_usage = 0  
     plate_img = img.copy()
         
     for (x,y,w,h) in plate_rects:
@@ -111,6 +112,8 @@ def detect_blur(img, plate_rects):
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Testing the methods with some parameters
+"""
+
 
 name = "car1"
 name_open = name+".jpg"
@@ -151,6 +154,6 @@ for (x,y,w,h) in plate_rects5:
     plt.show()
 
 
-
+"""
 
 

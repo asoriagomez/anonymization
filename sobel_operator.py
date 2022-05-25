@@ -8,14 +8,13 @@ from os import listdir
 from os.path import isfile, join
 
 
-def calculate_sobel(filename):
+def calculate_sobel(src, show=True):
 
-    image = cv2.imread(filename)
-    resized = cv2.resize(image,(490, 160))
+    image = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
+    resized = image#cv2.resize(image,(1440, 1920))
     denoised = cv2.GaussianBlur(resized, (5,5), 0)
-    grayed = cv2.cvtColor(denoised, cv2.COLOR_BGR2GRAY)
-    sobel = cv2.Sobel(grayed, cv2.CV_16UC1, 1, 1, ksize=3, scale = 5, delta = 5, borderType=cv2.BORDER_DEFAULT)
-    print(sobel)
+    sobel = cv2.Sobel(denoised, cv2.CV_16UC1, 1, 1, ksize=3, scale = 5, delta = 5, borderType=cv2.BORDER_DEFAULT)
+    
     param_1 = 10 #actual threshold
     param_2 = 255 #value to put over threshold
     param_3 = cv2.THRESH_BINARY#_INV #+ cv2.THRESH_OTSU extra flags
@@ -24,12 +23,16 @@ def calculate_sobel(filename):
     edges = np.sum(thresholded)
 
     sharpness = edges/area
-    print('sharpnes = ', str(sharpness))
-    plt.imshow(thresholded, cmap='gray')
-    plt.title('Sharpness with Sobel operator')
-    plt.show()
+    #print('sharpnes = ', str(sharpness))
+    if show:
+        plt.imshow(thresholded, cmap='gray')
+        plt.title('Sharpness with Sobel operator')
+        plt.show()
+    else:
+        None
 
     return sharpness
+"""
 
 mypath_in = '/home/asoria/Documents/zita9999/detected_plates_graycar/after_blurring/'
 onlyfiles = [f for f in listdir(mypath_in) if isfile(join(mypath_in, f))]
@@ -40,4 +43,7 @@ for f in onlyfiles:
     sh = calculate_sobel(filename)
     sharpnesses[f] = sh
 print(sharpnesses)
+
+"""
+
 

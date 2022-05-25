@@ -7,6 +7,7 @@ from skimage.util import img_as_ubyte
 import cv2
 import warnings
 warnings.filterwarnings('ignore')
+from os.path import isfile, join
 
 
 
@@ -16,7 +17,7 @@ warnings.filterwarnings('ignore')
 # it is a naive approach but at least works
 
 
-def aux_calculate_sharpness(array, title):
+def aux_calculate_sharpness(array, show=True):
     """
     Inputs
     - np.int32 array which can be (a piece of) an image in grayscale
@@ -26,20 +27,23 @@ def aux_calculate_sharpness(array, title):
     - Average of squared gradients of the grayscale array
     - Visualization of the gradients of the array
     """
-    
+    array = cv2.cvtColor(array, cv2.COLOR_BGR2GRAY)
+
     gy, gx = np.gradient(array)
     gnorm = np.sqrt(gx**2 + gy**2)
     sharpness = np.average(gnorm)
 
     #to display a nice visual result, but which is then not used for computation
     selection_element = disk(2) # matrix of n pixels with a disk shape
-    cat_sharpness = gradient(array, selection_element)
-
-    plt.imshow(cat_sharpness)
-    plt.axis('off')
-    plt.colorbar()
-    plt.title(title)
-    plt.show()
+    cat_sharpness = gradient(array, selection_element) 
+    if show:
+        plt.imshow(cat_sharpness)
+        plt.axis('off')
+        plt.colorbar()
+        plt.title('Average of square gradients')
+        plt.show()
+    else:
+        None
     return sharpness
 
 
@@ -58,17 +62,18 @@ def calculate_avg_sq_gradients(filename,plate_rects = []):
     array_im = np.asarray(im, dtype=np.int32)
 
     if len(plate_rects) == 0:
-        print('Empty plate_rects, calculate ASG for whole image')
+        #print('Empty plate_rects, calculate ASG for whole image')
         plate_rects = [(0,0,array_im.shape[-1],array_im.shape[0])]
 
     else:
-        print('Calculate sharpness for each blurred rectangle')
+        None
+        #print('Calculate sharpness for each blurred rectangle')
 
     all_sharpness = []
     nsec = 0
     for (x,y,w,h) in plate_rects:
         nsec+=1
-        print("x=",x,"y=",y,"w=", w, "h=",h)
+        #print("x=",x,"y=",y,"w=", w, "h=",h)
         x_offset = x
         y_offset = y
         
@@ -78,16 +83,19 @@ def calculate_avg_sq_gradients(filename,plate_rects = []):
         #getting the points that show the license plate
         array_section = array_im[y_offset:y_end, x_offset:x_end]
         plt.imshow(array_section, cmap='gray')
+        plt.title('Grayscale image')
         plt.show()
-        sharpness = aux_calculate_sharpness(array_section,name+' section: '+str(nsec))
+
+        sharpness = aux_calculate_sharpness(array_section,title =' section: '+str(nsec))
         all_sharpness.append(sharpness)
-        print(all_sharpness)
+        #print(all_sharpness)
     return all_sharpness
 
 
 
 # ------------------------------------------------------------------------------------------------------------- #
 # Trying out the code with different parameters 
+"""
 
 name = "car1.jpg"#_blurredX_1.1_nei_3.png"
 filename = "/home/asoria/Documents/zita9999/"+name
@@ -101,3 +109,4 @@ plate_rects = [[1688 , 235 , 129  , 43],
 #plate_rects = []
 
 calculate_avg_sq_gradients(filename, plate_rects)
+"""

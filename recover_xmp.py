@@ -21,8 +21,8 @@ def copy_xmp_files(original_path, destination_path):
     xmpfile2.close_file()
 
 
-mypath_in = "/home/asoria/Documents/Blurring_andreas/understand-ai-anonymizer/images/ID823311/"
-mypath_out = "/home/asoria/Documents/Blurring_andreas/understand-ai-anonymizer/results/ID823311/"
+mypath_in = '/home/asoria/Documents/alicia_blurring_openCV/ID1055745_black_plates_singapur/clean_images/'
+mypath_out = '/home/asoria/Documents/alicia_blurring_openCV/ID1055745_black_plates_singapur/blurred_images/'
 
 onlyfiles_in = [f for f in listdir(mypath_in) if isfile(join(mypath_in, f)) and f.lower().endswith(('.png', '.jpg', '.jpeg', '.tiff', '.bmp', '.gif'))]
 
