@@ -15,7 +15,7 @@ def calculate_sobel(src, show=True):
     denoised = cv2.GaussianBlur(resized, (5,5), 0)
     sobel = cv2.Sobel(denoised, cv2.CV_16UC1, 1, 1, ksize=3, scale = 5, delta = 5, borderType=cv2.BORDER_DEFAULT)
     
-    param_1 = 10 #actual threshold
+    param_1 = 5 #actual threshold
     param_2 = 255 #value to put over threshold
     param_3 = cv2.THRESH_BINARY#_INV #+ cv2.THRESH_OTSU extra flags
     thresholded = cv2.threshold(sobel, param_1, param_2, param_3)[1]

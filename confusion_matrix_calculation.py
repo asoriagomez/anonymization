@@ -1,11 +1,12 @@
 
 from math import ceil
+from operator import length_hint
 
 from numpy import rec
 import numpy as np
 
 import matplotlib.pyplot as plt
-from sklearn.metrics import auc
+from sklearn.metrics import precision_score, recall_score
 
 
 def are_same(rect1, rect2, threshold):
@@ -59,8 +60,8 @@ def confusion_matrix_calc(gt, dp, IoU_threshold):
 
     """
     Input:
-    - an array of ground truths in format [[xTL, yTL, w, h], ...]
-    - an array of detected plates in format [[TL, BR], ...]
+    - an array of ground truths in format [[TL, BR], ...] 
+    - an array of detected plates in format [[xTL, yTL, w, h], ...]
     Output:
     - a tuple of (TN, TP, FN, FP, accuracy, precision, recall, f1)
     """
@@ -68,30 +69,49 @@ def confusion_matrix_calc(gt, dp, IoU_threshold):
     detected_plates = dp.copy()
     real_plates = []
 
-    for x in range(ceil(0.5*len(ground_truth))):
-        r = [ground_truth[x*2], ground_truth[x*2+1]]
-        real_plates.append(r)
-
-    TN = 0
+    if len(ground_truth)>0:
+        print(len(ground_truth))
+        for x in range(ceil(0.5*len(ground_truth))):
+            print('x=',x)
+            r = [ground_truth[x*2], ground_truth[x*2+1]]
+            real_plates.append(r)
+    else:
+        None
+    TN = 0 #by default
     TP = 0
 
     original_plates = real_plates.copy()
-    for r in original_plates:
-        for d in detected_plates:
-            if are_same(d, r, IoU_threshold):
-                TP+=1
-                real_plates.remove(r)
-                detected_plates.remove(d)
 
+    if len(original_plates)>0 and len(detected_plates)>0:
+   
+        for r in original_plates:
+            for d in detected_plates:
+                if are_same(d, r, IoU_threshold):
+                    TP+=1
+                    real_plates.remove(r)
+                    detected_plates.remove(d)
+    else:
+        None
     FN = len(real_plates)
     FP = len(detected_plates)
 
-    accuracy = (TP+TN)/(TP+TN+FP+FN)
-    precision = TP/(TP+FP) if (TP+FP)!=0 else 0
-    recall = TP/(TP+FN) if (TP+FN)!=0 else 0
+    accuracy = (TP+TN)/(TP+TN+FP+FN) if (TP+TN+FP+FN) != 0 else 0
+    precision = TP/(TP+FP) if (TP+FP)!=0 else 0.5 # you cannot penalize doing things correctly!
+    recall = TP/(TP+FN) if (TP+FN)!=0 else 0.5 # you cannot penalize doing things correctly!
     f1 = 2*precision*recall/(precision+recall) if (precision+recall)!=0 else 0
 
     return (TN, TP, FN, FP, accuracy, precision, recall, f1)
+
+def calc_f1s(gt, dp):
+    f1s = []
+    thres = np.linspace(0,1,50)
+    for t in thres:
+        (TN, TP, FN, FP, a, p, r, f1) = confusion_matrix_calc(gt, dp, t)
+        #print(TN, TP, FN, FP, a, p, r, f1)
+        f1s.append(f1)
+    return f1s, thres
+
+
 
 # -----------------------------------------------------------------------------
 # Test if algorithm works with some parameters

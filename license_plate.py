@@ -17,7 +17,8 @@ import psutil
 # ---------------------------------------------------------------------------------
 # Some nice functions: display, detect_plate3, detect_blur
 
-def display(image, destination, title='Figure', keep = []):
+def display(image, destination = " ", title='Figure', keep = []):
+    
     """
     Input:
     - an image file
@@ -42,7 +43,8 @@ def display(image, destination, title='Figure', keep = []):
     ax.imshow(show,cmap = 'gray')
     plt.title(title)
     plt.show()
-    cv2.imwrite(destination, img)
+    
+    #cv2.imwrite(destination, img)
 
 #@profile 
 def detect_plate3(img, scaleF = 1.1, minNei = 3):
@@ -61,36 +63,29 @@ def detect_plate3(img, scaleF = 1.1, minNei = 3):
 
     plate_img = img.copy()
     
-    #Cascade Classifier where our hundres of samples of license plates are
     plate_cascade = cv2.CascadeClassifier('/home/asoria/Documents/zita9999/haarcascades/haarcascade_russian_plate_number.xml')
 
-    #starttime5 = timeit.default_timer()
     starttime5  = datetime.now()
-    #print('psutil RAM percent before', str(psutil.virtual_memory()[2] ))
+    psutil_before = psutil.virtual_memory()[2]
+    print('psutil RAM percent before', str( psutil_before ))
     plate_rects, rejectLevels, levelWeights  = plate_cascade.detectMultiScale3(plate_img, scaleFactor = scaleF, minNeighbors = minNei, outputRejectLevels = True)	
-    #print('psutil RAM percent after ', str(psutil.virtual_memory()[2] ))
-    #end_time5 = timeit.default_timer()
+    psutil_after = psutil.virtual_memory()[2] 
+    print('psutil RAM percent after ', str(psutil_after))
     end_time5 = datetime.now()
     diff_time5 = end_time5 - starttime5
-    diff_time5 = diff_time5.total_seconds() #for the datetime.now() function
+    diff_time5 = diff_time5.total_seconds() #for the datetime.now() function    
 
-    #draws the rectangle around it
-    i=0
-    for (x,y,w,h) in plate_rects:
-        i=i+1
-        cv2.rectangle(plate_img, (x,y), (x+w, y+h), (255,0,0), 5)
-        a=int(y+h/2)
-        cv2.putText(plate_img,str(i),(x,a), cv2.FONT_ITALIC, 0.9,(0,0,255),2,cv2.LINE_AA)
-    #print(plate_rects) 
-    return plate_img, rejectLevels, levelWeights, diff_time5, plate_rects
+    return plate_img, rejectLevels, levelWeights, diff_time5, plate_rects, psutil_before, psutil_after
 
 
 #@profile
 def detect_blur(img, plate_rects):
-    delay_blur = 0
-    cpu_usage = 0  
+    
+    
     plate_img = img.copy()
-        
+    delay_blur = 0   
+    psutil_before = 0
+    psutil_after = 0
     for (x,y,w,h) in plate_rects:
         x_offset = x
         y_offset = y
@@ -101,14 +96,15 @@ def detect_blur(img, plate_rects):
         zoom_img = plate_img[y_offset:y_end, x_offset:x_end]
 
         starttime_blur = datetime.now()
-        cpu_usage = cpu_percent(0)
+        psutil_before = psutil.virtual_memory()[2] 
         zoom_img = cv2.medianBlur(zoom_img,15)
         delay_blur = datetime.now() - starttime_blur
-        
+        delay_blur = delay_blur.total_seconds() # for the format
         plate_img[y_offset:y_end, x_offset:x_end] = zoom_img
+        psutil_after = psutil.virtual_memory()[2]
         
-        
-    return plate_img, delay_blur, cpu_usage
+
+    return plate_img, delay_blur, psutil_before, psutil_after
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Testing the methods with some parameters

@@ -1,3 +1,4 @@
+from numpy import var
 from initial_checks import *
 from hsv_color_space import *
 from obtain_luminance import *
@@ -8,8 +9,6 @@ from hough_operator import *
 from lbp_operator import *
 from entropy_calculator import *
 
-
-folder_path = "/home/asoria/Documents/913440_not_localized/ID913440_images/"
 
 # Print table
 def print_table(title_table, mode_hue, median_sat, median_val,avgLy, varLy, skewness, kurt, asg, sobel, hough, moda, entropy):
@@ -29,9 +28,6 @@ def print_table(title_table, mode_hue, median_sat, median_val,avgLy, varLy, skew
     axs.set_title(title_table)
     plt.show()  
 
-# Check folder and check images ------------------------------------------------------------------------------------------------------------------------
-f_exists, is_empty, len_allimages, i_shape, all_images  = initial_checks_func(folder_path)
-print('Folder exists:', f_exists, ', and there are', len_allimages,'images of resolution:', i_shape[0],'px,',i_shape[1], 'px and',i_shape[2],'BGR color spaces.')
 
 # One image description -------------------------------------------------------------------------------------------------------------------------------
 def params_one_array(src, title_table, show=True, print_all=False):
@@ -65,9 +61,8 @@ def params_one_array(src, title_table, show=True, print_all=False):
         asg, sobel, hough, moda, entropy)
 
 # All project description (slow) -----------------------------------------------------------------------------------------------------------------------------
-def project_description(folder_path):
-    _, _, _, _, all_images  = initial_checks_func(folder_path)
-
+def project_description(folder_path, all_images, show=False):
+    img_chars = {}
     hue_imgs = []
     sat_imgs = []
     value_imgs = []
@@ -89,7 +84,8 @@ def project_description(folder_path):
         filename = join(folder_path, f)
         src = cv2.imread(filename) #in BGR
 
-        (hue_img, sat_img, value_img, mode_hue, median_sat, median_val, avgLy, varLy, skewness, kurt, asg, sobel, hough, moda, entrop) = params_one_array(src, f, False, False)
+        (hue_img, sat_img, value_img, mode_hue, median_sat, median_val, avgLy, varLy, skewness, kurt, asg, sobel, hough, moda, entrop) = params_one_array(src, f, show, False)
+        img_chars[f] = (hue_img, sat_img, value_img, mode_hue, median_sat, median_val, avgLy, varLy, skewness, kurt, asg, sobel, hough, moda, entrop)
         hue_imgs.append(hue_img)
         sat_imgs.append(sat_img)
         value_imgs.append(value_img)
@@ -115,7 +111,7 @@ def project_description(folder_path):
     fig, ax = plt.subplots(1,4)
 
     cm = plt.cm.get_cmap('hsv')
-    n, bins, patches = ax[0].hist(mode_hues, 30, range=[0,255])
+    n, bins, patches = ax[0].hist(mode_hues, 30)#, range=[0,255])
     bin_centers = 0.5 * (bins[:-1] + bins[1:])
     col = bin_centers - min(bin_centers)
     col /= max(col)
@@ -124,7 +120,7 @@ def project_description(folder_path):
     ax[0].set_title("Mode hues histogram")
 
     cm2 = plt.cm.get_cmap('gist_gray')
-    n, bins, patches = ax[1].hist(avgLys, 30, range=[0,255])
+    n, bins, patches = ax[1].hist(avgLys, 30)#, range=[0,255])
     bin_centers = 0.5 * (bins[:-1] + bins[1:])
     col = bin_centers - min(bin_centers)
     col /= max(col)
@@ -144,10 +140,18 @@ def project_description(folder_path):
         plt.setp(p, 'facecolor', cm3(c))
     ax[3].set_title("Entropies histogram")
 
+    varmodeHue = np.var(mode_hues)
+    varavgLys = np.var(avgLys)
+    varHough = np.var(houghs)
+    varEntropy = np.var(entropies)
     plt.show()
+    return (varmodeHue, varavgLys, varHough, varEntropy, img_chars)
+    
 
+"""
+folder_path = "/home/asoria/Documents/913440_not_localized/ID913440_images/"
 project_description(folder_path)
-
+"""
 
 
 

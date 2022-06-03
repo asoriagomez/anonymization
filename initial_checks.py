@@ -6,7 +6,6 @@ from os.path import isfile, join
 import cv2
 
 
-
 def initial_checks_func(folder_path):
 
     # Check folder exists
@@ -28,11 +27,16 @@ def initial_checks_func(folder_path):
         image_path = join(folder_path, i)
         image = cv2.imread(image_path)
         #print(image.shape) # if you are curious of all the images
+    len_allimages = len(all_images)
+    i_shape = image.shape
+    print('Folder exists:', f_exists, ', and there are', len_allimages,'images of resolution:', i_shape[0],'px,',i_shape[1], 'px and',i_shape[2],'BGR color spaces.')
 
     return (f_exists, isempty, len(all_images), image.shape, all_images)
 
 
 """
 folder_path = "/home/asoria/Documents/913440_not_localized/ID913440_images/"
-print(initial_checks(folder_path))
+f_exists, is_empty, len_allimages, i_shape, all_images  = initial_checks_func(folder_path)
+print('Folder exists:', f_exists, ', and there are', len_allimages,'images of resolution:', i_shape[0],'px,',i_shape[1], 'px and',i_shape[2],'BGR color spaces.')
+
 """    

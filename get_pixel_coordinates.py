@@ -8,7 +8,7 @@ def get_coordinates(filename):
     Inputs:
     - Path to an image
     Outputs:
-    - list of coordinates of the top-left, top-right, bottom-left points
+    - list of coordinates of the top-left, bottom-right points
     """
 
     left_clicks = list() #store coordinates
@@ -23,6 +23,8 @@ def get_coordinates(filename):
 
     image = cv2.imread(filename)
     cv2.namedWindow('image', cv2.WINDOW_NORMAL)
+    cv2.resizeWindow('image', image.shape[0]*2,image.shape[1]*2)
+
     cv2.imshow('image', image)
     cv2.setMouseCallback('image', mouse_callback)
     
@@ -30,6 +32,7 @@ def get_coordinates(filename):
     return left_clicks
 
 """
+
 # -------------------------------------------------------------------------------
 # Try algorithm with some parameters
 name = "car1"

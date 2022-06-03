@@ -25,7 +25,13 @@ def hsv_color(src, show_all=True, show_hist=False):
     plot_hsv_histograms(hue_img, sat_img, value_img) if show_all else None
     plot_only_histograms(hue_img, sat_img, value_img) if show_hist else None
 
-    return (hue_img, sat_img, value_img, np.bincount((hue_img*255).flatten().astype('int64')).argmax(), np.median(sat_img), np.median(value_img*255))
+    n, bins, _ = plt.hist(hue_img.flatten()*255, 30)
+    plt.close()
+    mode_index = n.argmax()
+    
+    mode_hue = bins[mode_index]
+
+    return (hue_img, sat_img, value_img, mode_hue, np.median(sat_img), np.median(value_img*255))
 
 def plot_hsv_histograms(hue_img, sat_img, value_img):
 
