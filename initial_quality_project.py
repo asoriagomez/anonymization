@@ -30,7 +30,7 @@ def print_table(title_table, mode_hue, median_sat, median_val,avgLy, varLy, skew
 
 
 # One image description -------------------------------------------------------------------------------------------------------------------------------
-def params_one_array(src, title_table, show=True, print_all=False):
+def params_one_array(src, title_table, show=False, print_all=False):
 
     (hue_img, sat_img, value_img, mode_hue, median_sat, median_val) = hsv_color(src, show, show)
     (avgLy, varLy) = aux_log_avg_var_luminance(src, show)
@@ -53,7 +53,7 @@ def params_one_array(src, title_table, show=True, print_all=False):
     else:
         None
 
-    print_table(title_table, mode_hue, median_sat, median_val,avgLy, varLy, skewness, kurt, asg, sobel, hough, moda, entropy)
+    #print_table(title_table, mode_hue, median_sat, median_val,avgLy, varLy, skewness, kurt, asg, sobel, hough, moda, entropy)
 
     return (hue_img, sat_img, value_img, mode_hue, median_sat, median_val, \
         avgLy, varLy, \
@@ -61,7 +61,7 @@ def params_one_array(src, title_table, show=True, print_all=False):
         asg, sobel, hough, moda, entropy)
 
 # All project description (slow) -----------------------------------------------------------------------------------------------------------------------------
-def project_description(folder_path, all_images, show=False):
+def project_description(folder_path, all_images, show=True, x =" "):
     img_chars = {}
     hue_imgs = []
     sat_imgs = []
@@ -78,13 +78,19 @@ def project_description(folder_path, all_images, show=False):
     houghs = []
     modas = []
     entropies = []
-
+    n=0
+    v=False
     for f in all_images:
-        print(f)
+        if f=='Image_000071.jpg':
+            v=True
+        else:
+            v=False
+        n = n+1
+        #print(f)
         filename = join(folder_path, f)
         src = cv2.imread(filename) #in BGR
 
-        (hue_img, sat_img, value_img, mode_hue, median_sat, median_val, avgLy, varLy, skewness, kurt, asg, sobel, hough, moda, entrop) = params_one_array(src, f, show, False)
+        (hue_img, sat_img, value_img, mode_hue, median_sat, median_val, avgLy, varLy, skewness, kurt, asg, sobel, hough, moda, entrop) = params_one_array(src, f, show=v, print_all=v)
         img_chars[f] = (hue_img, sat_img, value_img, mode_hue, median_sat, median_val, avgLy, varLy, skewness, kurt, asg, sobel, hough, moda, entrop)
         hue_imgs.append(hue_img)
         sat_imgs.append(sat_img)
@@ -102,13 +108,18 @@ def project_description(folder_path, all_images, show=False):
         modas.append(moda)
         entropies.append(entrop)
 
+
+
+
     # This is just informative to show images overlapped
     median_hue = np.median(hue_imgs, axis = 0) # Its the median of the hues, you get a 'medianed' image
-    median_sat = np.median(sat_imgs, axis = 0)
-    median_val = np.median(value_imgs,  axis = 0)
+    median_satu = np.median(sat_imgs, axis = 0)
+    median_valu = np.median(value_imgs,  axis = 0)
 
     # This is useful
-    fig, ax = plt.subplots(1,4)
+    fig, ax = plt.subplots(1,4, figsize = (10,5))
+    fig.set_figheight(10)
+    fig.set_figwidth(25)
 
     cm = plt.cm.get_cmap('hsv')
     n, bins, patches = ax[0].hist(mode_hues, 30)#, range=[0,255])
@@ -144,7 +155,8 @@ def project_description(folder_path, all_images, show=False):
     varavgLys = np.var(avgLys)
     varHough = np.var(houghs)
     varEntropy = np.var(entropies)
-    plt.show()
+    #print(varmodeHue, varavgLys, varHough, varEntropy)
+    fig.savefig(x)
     return (varmodeHue, varavgLys, varHough, varEntropy, img_chars)
     
 

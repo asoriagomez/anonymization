@@ -10,13 +10,22 @@ from detection_pipeline import *
 def blur_automatic(all_images, filtered_dp_dict, folder_path_in):
     folder_path_out = join(folder_path_in,'blurred/')
     image_blurred_dict = {}
+    n=0
     for f in all_images:
+        
         destination = join(folder_path_out,f)
         filename = join(folder_path_in, f)
         src = cv2.imread(filename) #in BGR
+        
         plate_img, delay_blur, psutil_before, psutil_after = detect_blur(src, filtered_dp_dict[f]['keep'])
-
-        display(plate_img, title='Output of blurring algorithm', keep=filtered_dp_dict[f]['keep'])
+        if f=='Image_000071.jpg':
+            ii = cv2.cvtColor(plate_img, cv2.COLOR_BGR2RGB)
+            plt.imshow(ii)
+            plt.title('Blurred image')
+        else:
+            None
+        n = n+1
+        #display(plate_img, title='Output of blurring algorithm', keep=filtered_dp_dict[f]['keep'])
         image_blurred_dict[f] = {'diff_time': delay_blur, 'ram_before':psutil_before, 'ram_after':psutil_after, 'keep':filtered_dp_dict[f]['keep']}
         cv2.imwrite(destination, plate_img)
     return image_blurred_dict, folder_path_out
@@ -30,7 +39,7 @@ def check_all_blurred_quality(image_blurred_dict, all_images, folder_path_blurre
         src = cv2.imread(filename)
         copy_src = src.copy()
         detections = image_blurred_dict[f]['keep']
-        print(detections)
+        #print(detections)
 
         i=0
         unid_par = []

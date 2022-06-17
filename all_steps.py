@@ -4,12 +4,21 @@ from blurred_auto import *
 import pandas as pd
 from xml_files import *
 
+# DO THIS -------------------------------------------------------------------------------------------------
+
+# Provide the project folder paths
+hs = "/home/asoria/Documents/proyecto_bretagne/port_kerity/"
+
+
+folder_path = "/home/asoria/Documents/proyecto_bretagne/port_kerity/sample_original_images/"
+store_summary_dict = r'/home/asoria/Documents/proyecto_bretagne/port_kerity/summary_project.csv'
+
+
+# UNTIL HERE ------------------------------------------------------------------------------------------------
+
 # Create and empty dictionary for all the and results, create list of quality parameters
 summary_dict = {}
 params_images = ['modeHue', 'medianSat', 'medianVal', 'avgLy', 'varLy', 'skewness', 'kurtosis', 'asg', 'sobel', 'hough', 'modaLBP', 'entropy']
-
-# Provide the project folder path
-folder_path = "/home/asoria/Documents/proyecto_bretagne/port_kerity/original_images/"
 summary_dict['folder_name'] = folder_path
 
 
@@ -24,7 +33,8 @@ summary_dict['before']['inputs']['images'] = {}
 
 # Quality checks for each image in the project
 print('Project quality checks')
-(varmodeHue, varavgLys, varHough, varEntropy, img_chars) = project_description(folder_path, all_images, False)
+
+(varmodeHue, varavgLys, varHough, varEntropy, img_chars) = project_description(folder_path, all_images, False, join(hs,"hist_orig.png"))
 summary_dict['before']['inputs']['varmodeHue'] = varmodeHue
 summary_dict['before']['inputs']['varavgLys'] = varavgLys
 summary_dict['before']['inputs']['varHough'] = varHough
@@ -38,6 +48,7 @@ for image in all_images:
         p = params_images[n]
         summary_dict['before']['inputs']['images'][image]['img_char'][p] = img_chars[image][n+3]
 
+
 # Obtain ground truth
 print('Ground truth')
 image_gt_dict = obtain_gt(folder_path, all_images)
@@ -48,17 +59,11 @@ image_dp_dict = obtain_automatic(all_images, folder_path)
 
 # Display performance of detection algorithm
 print('Performance of detection algorithm')
-detection_performance(image_dp_dict, show=True)
+detection_performance(image_dp_dict, show=False, name=join(hs,"det_perf.png"))
 
 # Print GT and DP
 print('Ground truth ', image_gt_dict)
 print('Detections ', image_dp_dict)
-
-# Calculate optimum IoU for GT and DP to maximize F1 score in the project
-print('IoU calculation')
-th_opt = find_optim_iou(all_images, image_gt_dict, image_dp_dict, True)
-print('Optimum threshold = ',th_opt)
-summary_dict['th_opt'] = th_opt
 
 # Obtain the parameters for the ideal object to find
 print('Calculate ideal parameters')
@@ -81,10 +86,16 @@ for f in all_images:
             p = params_images[n]
             summary_dict['before']['inputs']['images'][f]['detections'][detname][p] = filtered_dp_dict[f]['unideal'][i][n+3]
 
+# Calculate optimum IoU for GT and DP to maximize F1 score in the project
+print('IoU calculation')
+th_opt = find_optim_iou(all_images, image_gt_dict, filtered_dp_dict, True)
+print('Optimum threshold = ',th_opt)
+summary_dict['th_opt'] = th_opt
+
 
 # Calculate F1 score for each image
 print('Calculate F1')
-image_f1_dict = img_eval_f1score(all_images, image_gt_dict, filtered_dp_dict, th_opt, False)
+image_f1_dict = img_eval_f1score(all_images, image_gt_dict, filtered_dp_dict, th_opt, True, join(hs,"F1.png"))
 for image in all_images:
     summary_dict['before']['inputs']['images'][image]['F1'] = image_f1_dict[image]
 
@@ -98,7 +109,7 @@ summary_dict['after']['inputs'] = {}
 
 # Display performance of blurring algorithm
 print('Performance of blurring algorithm')
-detection_performance(image_blurred_dict, True)
+detection_performance(image_blurred_dict, True, join(hs,"blur_perf.png"))
 
 # Evaluation of blurred detections
 print('Evaluate blurred detections')
@@ -114,15 +125,14 @@ for f in all_images:
     for i in range(ndetections):
         detname = 'det'+str(i+1)
         summary_dict['after']['inputs']['images'][f]['detections'][detname] = {}
-        summary_dict['after']['inputs']['images'][f]['detections'][detname]['coordis'] = augmented_blurred_dict[f]['keep'][i] 
+        summary_dict['after']['inputs']['images'][f]['detections'][detname]['coordis'] = augmented_blurred_dict[f]['keep'][i]
 
         for n in range(len(params_images)):
             p = params_images[n]
             summary_dict['after']['inputs']['images'][f]['detections'][detname][p] = augmented_blurred_dict[f]['unideal'][i][n+3]
-
-# Quality checks for each image in the blurred project
 print('Evaluate blurred images')
-(varmodeHue_b, varavgLys_b, varHough_b, varEntropy_b, img_chars_b) = project_description(folder_path_out, all_images, show=False)
+
+(varmodeHue_b, varavgLys_b, varHough_b, varEntropy_b, img_chars_b) = project_description(folder_path_out, all_images, show=False, x = join(hs,"hist_blur.png"))
 summary_dict['after']['inputs']['varmodeHue'] = varmodeHue_b
 summary_dict['after']['inputs']['varavgLys'] = varavgLys_b
 summary_dict['after']['inputs']['varHough'] = varHough_b
@@ -135,17 +145,22 @@ for image in all_images:
             p = params_images[n]
             summary_dict['after']['inputs']['images'][image]['img_char'][p] = img_chars_b[image][n+3]
 
-df = pd.DataFrame.from_dict(summary_dict) 
-df.to_csv(r'/home/asoria/Documents/proyecto_bretagne/port_kerity/summary_project.csv')        
+df6 = pd.DataFrame.from_dict(summary_dict) 
+print(df6)
+df6.to_csv(store_summary_dict)        
 rec_print(summary_dict,0)
 
 #---------------------------------------------------------------------------
 #---------------------------------------------------------------------------
 #---------------------------------------------------------------------------
-"""
+
+report_before_path = '/home/asoria/Documents/proyecto_bretagne/port_kerity/report_original.xml'
+report_after_path = '/home/asoria/Documents/proyecto_bretagne/port_kerity/report_blurred.xml'
+store_report_dict = r'/home/asoria/Documents/proyecto_bretagne/port_kerity/report_project.csv'
+
+# UNTIL HERE
+
 report_dict = {}
-report_before_path = '/home/asoria/Downloads/report.xml'
-report_after_path = '/home/asoria/Downloads/report.xml'
 
 report_dict['before'] = {}
 report_dict['after'] = {}
@@ -160,11 +175,13 @@ report_dict['after']['CCompare'] = {}
 
 params_cloud = ['n_calibrated', 'GSD', 'optim', '2D_BBA', '3D_BBA', 'keypoints_img', 'matches_img', 'mre']
 params_matic = ['MTP1', 'MTP2', 'MTP3', 'MTP4']
-params_cc = ['RMS_register', 'avg_dist', 'sigma', 'max_error']
+params_cc = ['RMS_register', 'avg_dist', 'sigma']
 
 
 results_before_cloud = get_xml_thingies(report_before_path)
+print('DONE report before path')
 results_after_cloud = get_xml_thingies(report_after_path)
+print('DONE results after path')
 
 n = 0
 for x in params_cloud:
@@ -182,6 +199,6 @@ for x in params_cc:
 
 
 df2 = pd.DataFrame.from_dict(report_dict) 
-df2.to_csv(r'/home/asoria/Documents/proyecto_bretagne/port_kerity/report_project.csv')        
+df2.to_csv(store_report_dict)        
 rec_print(report_dict,0)
-"""
+

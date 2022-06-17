@@ -13,7 +13,7 @@ def get_coordinates(filename):
 
     left_clicks = list() #store coordinates
 
-    #this function will be called whenever the mouse is right-clicked
+    #this function will be called whenever the mouse is left-clicked
     def mouse_callback(event, x, y, flags, params):
 
         if event == 1: #left click

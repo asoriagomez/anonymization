@@ -68,11 +68,12 @@ def confusion_matrix_calc(gt, dp, IoU_threshold):
     ground_truth = gt.copy()
     detected_plates = dp.copy()
     real_plates = []
+    le = len(ground_truth)
 
-    if len(ground_truth)>0:
-        print(len(ground_truth))
-        for x in range(ceil(0.5*len(ground_truth))):
-            print('x=',x)
+    if le>0:
+        
+        for x in range(ceil(0.5*le)):
+            
             r = [ground_truth[x*2], ground_truth[x*2+1]]
             real_plates.append(r)
     else:

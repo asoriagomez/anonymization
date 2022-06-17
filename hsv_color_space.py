@@ -23,7 +23,7 @@ def hsv_color(src, show_all=True, show_hist=False):
     value_img = hsv_img[:, :, 2]
 
     plot_hsv_histograms(hue_img, sat_img, value_img) if show_all else None
-    plot_only_histograms(hue_img, sat_img, value_img) if show_hist else None
+    #plot_only_histograms(hue_img, sat_img, value_img) if show_hist else None
 
     n, bins, _ = plt.hist(hue_img.flatten()*255, 30)
     plt.close()
@@ -87,7 +87,7 @@ def plot_hsv_histograms(hue_img, sat_img, value_img):
     ax[1][2].set_title("Value channel histogram")
 
 
-    ax[0][1].imshow(sat_img, cmap = 'Blues')
+    ax[0][1].imshow(sat_img, cmap='Greys')
     ax[0][1].set_title("Saturation image")
     ax[0][1].axis('off')
 

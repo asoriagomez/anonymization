@@ -37,7 +37,7 @@ def display(image, destination = " ", title='Figure', keep = []):
         a=int(y+h/2)
         cv2.putText(img,str(i),(x,a), cv2.FONT_ITALIC, 0.9,(0,0,255),2,cv2.LINE_AA)
     
-    fig = plt.figure(figsize = (12,10))
+    fig = plt.figure()
     ax = fig.add_subplot(111)
     show = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     ax.imshow(show,cmap = 'gray')
@@ -62,15 +62,19 @@ def detect_plate3(img, scaleF = 1.1, minNei = 3):
     """
 
     plate_img = img.copy()
-    
-    plate_cascade = cv2.CascadeClassifier('/home/asoria/Documents/zita9999/haarcascades/haarcascade_russian_plate_number.xml')
 
+    #plate_cascade = cv2.CascadeClassifier('/home/asoria/Documents/zita9999/haarcascades/mallick_haarcascade_profileface.xml')
+
+    #plate_cascade = cv2.CascadeClassifier('/home/asoria/Documents/zita9999/haarcascades/mallick_haarcascade_frontalface_default.xml')
+    plate_cascade = cv2.CascadeClassifier('/home/asoria/Documents/zita9999/haarcascades/mallick_haarcascade_russian_plate_number.xml')
+
+    # /home/asoria/Documents/zita9999/haarcascades/mallick_haarcascade_russian_plate_number.xml
     starttime5  = datetime.now()
     psutil_before = psutil.virtual_memory()[2]
-    print('psutil RAM percent before', str( psutil_before ))
+    #print('psutil RAM percent before', str( psutil_before ))
     plate_rects, rejectLevels, levelWeights  = plate_cascade.detectMultiScale3(plate_img, scaleFactor = scaleF, minNeighbors = minNei, outputRejectLevels = True)	
     psutil_after = psutil.virtual_memory()[2] 
-    print('psutil RAM percent after ', str(psutil_after))
+    #print('psutil RAM percent after ', str(psutil_after))
     end_time5 = datetime.now()
     diff_time5 = end_time5 - starttime5
     diff_time5 = diff_time5.total_seconds() #for the datetime.now() function    
@@ -97,7 +101,7 @@ def detect_blur(img, plate_rects):
 
         starttime_blur = datetime.now()
         psutil_before = psutil.virtual_memory()[2] 
-        zoom_img = cv2.medianBlur(zoom_img,15)
+        zoom_img = cv2.medianBlur(zoom_img,25)
         delay_blur = datetime.now() - starttime_blur
         delay_blur = delay_blur.total_seconds() # for the format
         plate_img[y_offset:y_end, x_offset:x_end] = zoom_img
