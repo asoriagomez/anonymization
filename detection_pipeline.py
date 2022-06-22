@@ -38,11 +38,12 @@ def obtain_automatic(all_images, folder_path):
         
         keep = NMS(plate_rects, levelWeights)
         #print('Filtered keep: ', keep)
+        """
         if f=='Image_000071.jpg':
             display(plate_img_copy, title='Output of NMS algorithm', keep=keep)
         else:
             None
-        #
+        """
         image_dp_dict[f] = {'keep':keep, 'diff_time':diff_time5, 'ram_before':psutil_before, 'ram_after':psutil_after}
     return image_dp_dict
 
@@ -141,8 +142,10 @@ def set_baseline(ideal_filename):
     
     ideal_params =  params_one_array(ideal_image, 'Ideal parameters', show=False, print_all=False)
     ii = cv2.cvtColor(ideal_image, cv2.COLOR_BGR2RGB)
+    """
     plt.imshow(ii)
     plt.title('Ideal detection')
+    """
     return ideal_params
 
 

@@ -81,10 +81,14 @@ def project_description(folder_path, all_images, show=True, x =" "):
     n=0
     v=False
     for f in all_images:
+        print(". \n")
+        
         if f=='Image_000071.jpg':
-            v=True
+            #v=True
+            v = False
         else:
             v=False
+        
         n = n+1
         #print(f)
         filename = join(folder_path, f)
@@ -115,7 +119,7 @@ def project_description(folder_path, all_images, show=True, x =" "):
     median_hue = np.median(hue_imgs, axis = 0) # Its the median of the hues, you get a 'medianed' image
     median_satu = np.median(sat_imgs, axis = 0)
     median_valu = np.median(value_imgs,  axis = 0)
-
+    """
     # This is useful
     fig, ax = plt.subplots(1,4, figsize = (10,5))
     fig.set_figheight(10)
@@ -150,13 +154,14 @@ def project_description(folder_path, all_images, show=True, x =" "):
     for c, p in zip(col, patches):
         plt.setp(p, 'facecolor', cm3(c))
     ax[3].set_title("Entropies histogram")
-
+    """
     varmodeHue = np.var(mode_hues)
     varavgLys = np.var(avgLys)
     varHough = np.var(houghs)
     varEntropy = np.var(entropies)
     #print(varmodeHue, varavgLys, varHough, varEntropy)
-    fig.savefig(x)
+    #fig.savefig(x)
+    
     return (varmodeHue, varavgLys, varHough, varEntropy, img_chars)
     
 

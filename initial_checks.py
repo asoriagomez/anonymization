@@ -4,10 +4,11 @@ from os import path
 from os import listdir
 from os.path import isfile, join
 import cv2
+import random
 
 import matplotlib.pyplot as plt
 
-def initial_checks_func(folder_path):
+def initial_checks_func(folder_path, percentage=10):
 
     # Check folder exists
     f_exists = path.exists(folder_path)
@@ -18,7 +19,11 @@ def initial_checks_func(folder_path):
     #print('The folder is empty: ', isempty)
 
     # Format is image based
-    all_images = [f for f in listdir(folder_path) if isfile(join(folder_path, f)) and f.lower().endswith(('.png', '.jpg', '.jpeg', '.tiff', '.bmp', '.gif')) ]
+    all_images1 = [f for f in listdir(folder_path) if isfile(join(folder_path, f)) and f.lower().endswith(('.png', '.jpg', '.jpeg', '.tiff', '.bmp', '.gif')) ]
+
+    nget = int(len(all_images1)*percentage/100)
+    all_images = random.sample(all_images1, nget)
+    all_images.append('Image_000071.jpg')
 
     # Number of images
     #print(len(all_images))
@@ -28,12 +33,14 @@ def initial_checks_func(folder_path):
     for i in all_images:
         image_path = join(folder_path, i)
         image = cv2.imread(image_path)
+        """
         if i=='Image_000071.jpg':
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             plt.imshow(image)
             plt.title('Example image of the project')
         else:
             None
+        """
         n = n+1
         #print(image.shape) # if you are curious of all the images
     len_allimages = len(all_images)

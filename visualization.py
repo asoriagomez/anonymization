@@ -1,6 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import cv2
+from os.path import isfile, join
+
 
 
 # Quality of the images
@@ -45,6 +48,48 @@ def quality_images(summary_dict, name):
     plt.suptitle('Histograms of quality of **images**')
     f.savefig(name)
 
+# Quality of the blurred
+def quality_blurred(summary_dict, name):
+
+    qu_params = ['modeHue','medianSat', 'medianVal', 'avgLy', 'varLy', 'skewness', 'kurtosis', 'asg', 'sobel', 'hough', 'modaLBP', 'entropy']
+    qu_params
+    info = {}
+    for q in qu_params:
+        info[q]=[]
+
+    for img in summary_dict['after']['inputs']['images']:
+        v = summary_dict['after']['inputs']['images'][img]['img_char']
+        for q in qu_params:
+            a = summary_dict['after']['inputs']['images'][img]['img_char'][q]
+            
+            info[q].append(a)
+
+    dd = pd.DataFrame(info)
+
+    qu_params = ['modeHue','medianSat', 'medianVal', 'avgLy', 'varLy', 'skewness', 'kurtosis', 'asg', 'sobel', 'hough', 'modaLBP', 'entropy']
+
+    row_old = 0
+    col = 0
+    colors = ['m', 'k', 'm', 'k', 'm', 'k', 'm', 'k', 'm', 'k', 'm', 'k']
+    f,a = plt.subplots(4, 3, figsize = (23,15))
+
+    for i in range(12):
+        p = qu_params[i]
+
+        row = int(np.floor(i/3))
+        if row_old!=row:
+            col=0
+        
+        row_old = row
+        values = list(dd[p])
+        a[row][col].hist(values,align='left', bins = 30, color = colors[i], alpha = 0.7, label = ['Avg = '+ str(np.round(np.mean(values),2))+ '; Var = '+ str(np.round(np.var(values),2))])
+        a[row][col].legend()
+        a[row][col].set_xlabel(p)
+        a[row][col].grid()
+        col = col+1
+    plt.suptitle('Histograms of quality of **blurred**')
+    f.savefig(name)
+
 # 1) Histogram of the number of detections per image
 def ndet_peri(summary_dict, name):
 
@@ -76,20 +121,22 @@ def ndet_peri(summary_dict, name):
 
 
 # Histogram of the size of detections
-def hist_size_det(summary_dict, name):
+def hist_size_det(summary_dict, name, hs):
     size_det = []
     for k in summary_dict['before']['inputs']['images']:
         v = summary_dict['before']['inputs']['images'][k]['detections']
+        image = cv2.imread(join(hs,k))
+        s = image.shape
         for k1 in v:
             coo = summary_dict['before']['inputs']['images'][k]['detections'][k1]['coordis']
-            siz = coo[2]*coo[3]
+            siz = 100*coo[2]*coo[3] /(s[0]*s[1])
             size_det.append(siz)
     fig1, ax1 = plt.subplots()
     fig1.set_figheight(5)
     fig1.set_figwidth(10)
     ax1.set_ylabel('N° repetitions')
-    ax1.set_xlabel('Size of detections')
-    ax1.set_title('Histogram of size of detections')
+    ax1.set_xlabel('Percentage of the size of detections')
+    ax1.set_title('Histogram of the  size of detections')
     n1, bins1, patches1 = ax1.hist(size_det, color = 'g', bins = 50 , align='left')
     ax1.spines['top'].set_visible(False)
     ax1.spines['right'].set_visible(False)
@@ -295,41 +342,7 @@ def histogram_detections_deg(summary_dict, name):
 
 
 
-# 3D results
-def results_3d(report_dict, name):
-    aux_report = {}
-    aux_report['before']={}
-    aux_report['after'] = {}
 
-    for k in report_dict['before']:
-        v = report_dict['before'][k]
-        for interesting in v:
-            aux_report['before'][interesting] = report_dict['before'][k][interesting]
-            aux_report['after'][interesting] = report_dict['after'][k][interesting]
-    dx = pd.DataFrame(aux_report)
-
-    pp =[]
-    withoutnones={}
-    withoutnones['before']={}
-    withoutnones['after']={}
-    for p in list(dx.index):
-        if dx['before'][p] != None:
-            if len(dx['before'][p])!=0 :
-                if dx['after'][p] != None:
-                    if len(dx['after'][p])!=0:
-                        pp.append(p)
-
-    pdw = dx.loc[pp]
-    vv = [100*(float(pdw['before'].values[i])- float(pdw['after'].values[i]) )/ float(pdw['before'].values[i]) for i in range(len(pdw['before']))]
-
-    pdw['degradation_perc'] = vv
-    f, a = plt.subplots(figsize = (15, 4))
-    a.bar(pdw.index,pdw['degradation_perc'], alpha = 0.5);
-    a.set_title('Degradation of the 3D model')
-    a.set_ylabel('% of degradation')
-    a.set_xlabel('Available parameters')
-    print(pdw)
-    f.savefig(name)
 
 import math
 from statsmodels.stats import diagnostic
