@@ -61,7 +61,7 @@ def params_one_array(src, title_table, show=False, print_all=False):
         asg, sobel, hough, moda, entropy)
 
 # All project description (slow) -----------------------------------------------------------------------------------------------------------------------------
-def project_description(folder_path, all_images, show=True, x =" "):
+def project_description(folder_path, all_images, show=True, x =" ", info = True):
     img_chars = {}
     hue_imgs = []
     sat_imgs = []
@@ -81,11 +81,10 @@ def project_description(folder_path, all_images, show=True, x =" "):
     n=0
     v=False
     for f in all_images:
-        print(". \n")
+        #print(n)
         
         if f=='Image_000071.jpg':
-            #v=True
-            v = False
+            v=True if info else False
         else:
             v=False
         
@@ -114,53 +113,55 @@ def project_description(folder_path, all_images, show=True, x =" "):
 
 
 
+    if info:
+        # This is just informative to show images overlapped
+        median_hue = np.median(hue_imgs, axis = 0) # Its the median of the hues, you get a 'medianed' image
+        median_satu = np.median(sat_imgs, axis = 0)
+        median_valu = np.median(value_imgs,  axis = 0)
+        
+        # This is useful
+        fig, ax = plt.subplots(1,4, figsize = (10,5))
+        fig.set_figheight(10)
+        fig.set_figwidth(25)
 
-    # This is just informative to show images overlapped
-    median_hue = np.median(hue_imgs, axis = 0) # Its the median of the hues, you get a 'medianed' image
-    median_satu = np.median(sat_imgs, axis = 0)
-    median_valu = np.median(value_imgs,  axis = 0)
-    """
-    # This is useful
-    fig, ax = plt.subplots(1,4, figsize = (10,5))
-    fig.set_figheight(10)
-    fig.set_figwidth(25)
+        cm = plt.cm.get_cmap('hsv')
+        n, bins, patches = ax[0].hist(mode_hues, 30)#, range=[0,255])
+        bin_centers = 0.5 * (bins[:-1] + bins[1:])
+        col = bin_centers - min(bin_centers)
+        col /= max(col)
+        for c, p in zip(col, patches):
+            plt.setp(p, 'facecolor', cm(c))
+        ax[0].set_title("Mode hues histogram")
 
-    cm = plt.cm.get_cmap('hsv')
-    n, bins, patches = ax[0].hist(mode_hues, 30)#, range=[0,255])
-    bin_centers = 0.5 * (bins[:-1] + bins[1:])
-    col = bin_centers - min(bin_centers)
-    col /= max(col)
-    for c, p in zip(col, patches):
-        plt.setp(p, 'facecolor', cm(c))
-    ax[0].set_title("Mode hues histogram")
+        cm2 = plt.cm.get_cmap('gist_gray')
+        n, bins, patches = ax[1].hist(avgLys, 30)#, range=[0,255])
+        bin_centers = 0.5 * (bins[:-1] + bins[1:])
+        col = bin_centers - min(bin_centers)
+        col /= max(col)
+        for c, p in zip(col, patches):
+            plt.setp(p, 'facecolor', cm2(c))
+        ax[1].set_title("AvgLys histogram")
 
-    cm2 = plt.cm.get_cmap('gist_gray')
-    n, bins, patches = ax[1].hist(avgLys, 30)#, range=[0,255])
-    bin_centers = 0.5 * (bins[:-1] + bins[1:])
-    col = bin_centers - min(bin_centers)
-    col /= max(col)
-    for c, p in zip(col, patches):
-        plt.setp(p, 'facecolor', cm2(c))
-    ax[1].set_title("AvgLys histogram")
+        ax[2].hist(houghs, bins = 30, color='red')
+        ax[2].set_title('Hough lines histogram')
 
-    ax[2].hist(houghs, bins = 30, color='red')
-    ax[2].set_title('Hough lines histogram')
-
-    cm3 = plt.cm.get_cmap('magma')
-    n, bins, patches = ax[3].hist(entropies, 30)
-    bin_centers = 0.5 * (bins[:-1] + bins[1:])
-    col = bin_centers - min(bin_centers)
-    col /= max(col)
-    for c, p in zip(col, patches):
-        plt.setp(p, 'facecolor', cm3(c))
-    ax[3].set_title("Entropies histogram")
-    """
-    varmodeHue = np.var(mode_hues)
-    varavgLys = np.var(avgLys)
-    varHough = np.var(houghs)
-    varEntropy = np.var(entropies)
-    #print(varmodeHue, varavgLys, varHough, varEntropy)
-    #fig.savefig(x)
+        cm3 = plt.cm.get_cmap('magma')
+        n, bins, patches = ax[3].hist(entropies, 30)
+        bin_centers = 0.5 * (bins[:-1] + bins[1:])
+        col = bin_centers - min(bin_centers)
+        col /= max(col)
+        for c, p in zip(col, patches):
+            plt.setp(p, 'facecolor', cm3(c))
+        ax[3].set_title("Entropies histogram")
+        
+        varmodeHue = np.var(mode_hues)
+        varavgLys = np.var(avgLys)
+        varHough = np.var(houghs)
+        varEntropy = np.var(entropies)
+        #print(varmodeHue, varavgLys, varHough, varEntropy)
+        fig.savefig(x)
+    else:
+        None
     
     return (varmodeHue, varavgLys, varHough, varEntropy, img_chars)
     

@@ -23,7 +23,7 @@ def obtain_gt(folder_path, all_images):
 
 
 # Obtain detections automatically
-def obtain_automatic(all_images, folder_path):
+def obtain_automatic(all_images, folder_path, info=False):
     image_dp_dict = {}
     n=-1
     for f in all_images:
@@ -32,18 +32,19 @@ def obtain_automatic(all_images, folder_path):
         src = cv2.imread(filename) #in BGR
         plate_img, _, levelWeights, diff_time5, plate_rects, psutil_before, psutil_after = detect_plate3(img = src, scaleF = 1.1, minNei = 3)
         plate_img_copy = plate_img.copy()
-        #print('Original plate rects: ', plate_rects)
-        # display(src, title='Output of openCV algorithm', keep = plate_rects)
-        #print('The confidence score is given by:',levelWeights)
-        
+        """
+        print('Original plate rects: ', plate_rects)
+        display(src, title='Output of openCV algorithm', keep = plate_rects)
+        print('The confidence score is given by:',levelWeights)
+        """
         keep = NMS(plate_rects, levelWeights)
         #print('Filtered keep: ', keep)
-        """
+        
         if f=='Image_000071.jpg':
-            display(plate_img_copy, title='Output of NMS algorithm', keep=keep)
+            display(plate_img_copy, title='Output of NMS algorithm', keep=keep) if info else None
         else:
             None
-        """
+        
         image_dp_dict[f] = {'keep':keep, 'diff_time':diff_time5, 'ram_before':psutil_before, 'ram_after':psutil_after}
     return image_dp_dict
 
@@ -137,15 +138,16 @@ def is_good(ideal_params, unideal_params):
 
 
 # 1) Set baseline of what you are looking for
-def set_baseline(ideal_filename):
+def set_baseline(ideal_filename, info):
     ideal_image = cv2.imread(ideal_filename)
     
     ideal_params =  params_one_array(ideal_image, 'Ideal parameters', show=False, print_all=False)
     ii = cv2.cvtColor(ideal_image, cv2.COLOR_BGR2RGB)
-    """
-    plt.imshow(ii)
-    plt.title('Ideal detection')
-    """
+    if info:
+        plt.imshow(ii)
+        plt.title('Ideal detection')
+    else:
+        None
     return ideal_params
 
 

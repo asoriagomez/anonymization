@@ -26,21 +26,21 @@ def initial_checks_func(folder_path, percentage=10):
     all_images.append('Image_000071.jpg')
 
     # Number of images
-    #print(len(all_images))
+    print('N images ',len(all_images))
 
     # Check the size of the images
     n = 0
     for i in all_images:
         image_path = join(folder_path, i)
         image = cv2.imread(image_path)
-        """
+        
         if i=='Image_000071.jpg':
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             plt.imshow(image)
             plt.title('Example image of the project')
         else:
             None
-        """
+        
         n = n+1
         #print(image.shape) # if you are curious of all the images
     len_allimages = len(all_images)

@@ -1,3 +1,5 @@
+from statistics import median
+from tkinter import N
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -255,7 +257,7 @@ def deg_of_project(summary_dict, name):
 
 
 # Histogram of percentages of degradation of each parameter of the images
-def degradation_images(summary_dict, name):
+def degradation_images(summary_dict, name, info):
 
     qu_params = ['modeHue','medianSat', 'medianVal', 'avgLy', 'varLy', 'skewness', 'kurtosis', 'asg', 'sobel', 'hough', 'modaLBP', 'entropy']
     qu_params
@@ -276,8 +278,8 @@ def degradation_images(summary_dict, name):
     row_old = 0
     col = 0
     colors = ['b', 'k', 'gray', 'y', 'y', 'c', 'c', 'g', 'k', 'r', 'orange', 'magenta']
-    f,a = plt.subplots(4, 3, figsize = (23,15))
-
+    f,a = plt.subplots(4, 3, figsize = (23,15)) if info else None
+    medians_images = []
     for i in range(12):
         p = qu_params[i]
 
@@ -287,16 +289,22 @@ def degradation_images(summary_dict, name):
         
         row_old = row
         values = list(dd[p])
-        a[row][col].hist(values,align='left', bins = 30, color = colors[i], alpha = 0.7, label = ['Avg = '+ str(np.round(np.mean(values),2))+ '; Var = '+ str(np.round(np.var(values),2))])
-        a[row][col].legend()
-        a[row][col].set_xlabel("% "+ p)
-        a[row][col].grid()
+        if info:
+            a[row][col].hist(values,align='left', bins = 30, color = colors[i], alpha = 0.7, label = ['Avg = '+ str(np.round(np.mean(values),2))+ '; Var = '+ str(np.round(np.var(values),2))])
+            a[row][col].legend()
+            a[row][col].set_xlabel("% "+ p)
+            a[row][col].grid()
+        else:
+            None
         col = col+1
+        medians_images.append(np.median(values))
     plt.suptitle('Histograms of relative degradation of **images**')
     f.savefig(name)
 
+    return medians_images
 
-def histogram_detections_deg(summary_dict, name):
+
+def histogram_detections_deg(summary_dict, name, info):
     qu_params = ['modeHue','medianSat', 'medianVal', 'avgLy', 'varLy', 'skewness', 'kurtosis', 'asg', 'sobel', 'hough', 'modaLBP', 'entropy']
     qu_params
     infor = {}
@@ -318,8 +326,8 @@ def histogram_detections_deg(summary_dict, name):
     row_old = 0
     col = 0
     colors = ['b', 'k', 'gray', 'y', 'y', 'c', 'c', 'g', 'k', 'r', 'orange', 'magenta']
-    f,a = plt.subplots(4, 3, figsize = (23,17))
-
+    f,a = plt.subplots(4, 3, figsize = (23,17)) if info else None
+    medians_detections = []
     for i in range(12):
         p = qu_params[i]
 
@@ -329,14 +337,18 @@ def histogram_detections_deg(summary_dict, name):
         
         row_old = row
         values = list(dd[p])
-        a[row][col].hist(values, align='left',bins = 30, color = colors[i], alpha = 0.99, label = ['Avg = '+p+ " "+str(np.round(np.mean(values),2))+ '; Var = '+ str(np.round(np.var(values),2))])
-        a[row][col].legend()
-        a[row][col].set_xlabel('% '+p)
-        a[row][col].grid()
+        if info:
+            a[row][col].hist(values, align='left',bins = 30, color = colors[i], alpha = 0.99, label = ['Avg = '+p+ " "+str(np.round(np.mean(values),2))+ '; Var = '+ str(np.round(np.var(values),2))])
+            a[row][col].legend()
+            a[row][col].set_xlabel('% '+p)
+            a[row][col].grid()
+        else:
+            None
         col = col+1
+        medians_detections.append(np.median(values))
     plt.suptitle('Histograms of relative degradation (%) of **detections**')
     f.savefig(name)
-    return dd
+    return dd, medians_detections
 #dd.corr().style.background_gradient(cmap='viridis').set_precision(2)
 
 

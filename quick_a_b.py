@@ -7,7 +7,8 @@ from visualization import *
 
 from matplotlib.pyplot import show, plot
 
-
+import matplotlib
+#matplotlib.use('Agg')
 
 def q_analyze_blur(hs, folder_path, store_summary_dict, report_before_path, report_after_path, store_report_dict):
         
@@ -19,7 +20,7 @@ def q_analyze_blur(hs, folder_path, store_summary_dict, report_before_path, repo
 
     # Initial checks to see the state of the folder
     print('Initial folder checks')
-    f_exists, isempty, n_images, shape_images, all_images = initial_checks_func(folder_path, 5) #its the percentage of images you want
+    f_exists, isempty, n_images, shape_images, all_images = initial_checks_func(folder_path, 5); #its the percentage of images you want
 
     summary_dict['n_imgs'] = n_images
     summary_dict['before'] = {}
@@ -30,7 +31,7 @@ def q_analyze_blur(hs, folder_path, store_summary_dict, report_before_path, repo
 
     # Quality checks for each image in the project
     print('Project quality checks')
-    (varmodeHue, varavgLys, varHough, varEntropy, img_chars) = project_description(folder_path, all_images, False, join(hs,"hist_orig.png"))
+    (varmodeHue, varavgLys, varHough, varEntropy, img_chars) = project_description(folder_path, all_images, False, join(hs,"hist_orig.png"), info = False);
     summary_dict['before']['inputs']['varmodeHue'] = varmodeHue
     summary_dict['before']['inputs']['varavgLys'] = varavgLys
     summary_dict['before']['inputs']['varHough'] = varHough
@@ -43,18 +44,18 @@ def q_analyze_blur(hs, folder_path, store_summary_dict, report_before_path, repo
         for n in range(len(params_images)):
             p = params_images[n]
             summary_dict['before']['inputs']['images'][image]['img_char'][p] = img_chars[image][n+3]
-    #quality_images(summary_dict,join(hs,"img_quality.png"))
+    #quality_images(summary_dict,join(hs,"img_quality.png"));
 
 
     # Run detection algorithm
     print('Detection algorithm')
-    image_dp_dict = obtain_automatic(all_images, folder_path)
+    image_dp_dict = obtain_automatic(all_images, folder_path, info = False)
 
 
     # Obtain the parameters for the ideal object to find
     print('Calculate ideal parameters')
     ideal_filename = '/home/asoria/Documents/913440_not_localized/ideal_greek_image'
-    ideal_params = set_baseline(ideal_filename)
+    ideal_params = set_baseline(ideal_filename, False)
 
 
 
@@ -74,18 +75,17 @@ def q_analyze_blur(hs, folder_path, store_summary_dict, report_before_path, repo
                 p = params_images[n]
                 summary_dict['before']['inputs']['images'][f]['detections'][detname][p] = filtered_dp_dict[f]['unideal'][i][n+3]
 
-    """
+    
     # Evaluate the quality of the detections
-    dd=histogram_detections(summary_dict, join(hs, "hist_det.png"))
-    dd.corr().style.background_gradient(cmap='coolwarm').set_precision(2)
-    """
+    #dd=histogram_detections(summary_dict, join(hs, "hist_det.png"))
+    #dd.corr().style.background_gradient(cmap='coolwarm').set_precision(2)
+    
 
     # Run blurring algorithm
     print('Blurring algorithm')
-    image_blurred_dict, folder_path_out = blur_automatic(all_images, filtered_dp_dict, folder_path)
+    image_blurred_dict, folder_path_out = blur_automatic(all_images, filtered_dp_dict, folder_path, False)
     summary_dict['after'] = {}
     summary_dict['after']['inputs'] = {}
-
 
 
 
@@ -111,7 +111,7 @@ def q_analyze_blur(hs, folder_path, store_summary_dict, report_before_path, repo
 
 
     # Evaluation of blurred project
-    (varmodeHue_b, varavgLys_b, varHough_b, varEntropy_b, img_chars_b) = project_description(folder_path_out, all_images, show=False, x = join(hs,"hist_blur.png"))
+    (varmodeHue_b, varavgLys_b, varHough_b, varEntropy_b, img_chars_b) = project_description(folder_path_out, all_images, show=False, x = join(hs,"hist_blur.png"), info = False)
     summary_dict['after']['inputs']['varmodeHue'] = varmodeHue_b
     summary_dict['after']['inputs']['varavgLys'] = varavgLys_b
     summary_dict['after']['inputs']['varHough'] = varHough_b
@@ -123,7 +123,7 @@ def q_analyze_blur(hs, folder_path, store_summary_dict, report_before_path, repo
         for n in range(len(params_images)):
                 p = params_images[n]
                 summary_dict['after']['inputs']['images'][image]['img_char'][p] = img_chars_b[image][n+3]
-    #quality_blurred(summary_dict, join(hs, "quality_blurred.png"))
+    quality_blurred(summary_dict, join(hs, "quality_blurred.png"))
 
 
     
@@ -131,11 +131,11 @@ def q_analyze_blur(hs, folder_path, store_summary_dict, report_before_path, repo
     #deg_of_project(summary_dict, join(hs, "deg_proj.png"))
 
     # Evaluate the degradation of the images
-    #degradation_images(summary_dict, join(hs, "deg_imgs.png"))
+    medians_images = degradation_images(summary_dict, join(hs, "deg_imgs.png"), False)
 
     # Evaluate the degradation of the detections !!!!
-    #dm = histogram_detections_deg(summary_dict, join(hs, "deg_detections.png"))
-    #dm.corr().style.background_gradient(cmap='viridis').set_precision(2)
+    dm, medians_detections = histogram_detections_deg(summary_dict, join(hs, "deg_detections.png"), False)
+    dm.corr().style.background_gradient(cmap='viridis').set_precision(2)
 
 
     # Storing the quality parameters, detection and blurring performances and evaluations
@@ -252,9 +252,10 @@ def q_analyze_blur(hs, folder_path, store_summary_dict, report_before_path, repo
         print(pdw)
         print(m)
         f.savefig(name)
+        return pdw['degradation_perc']
 
     # Analyze the 3D parameters
-    #results_3d1_adapted(report_dict, join(hs, "results_3d.png"))
+    deg_results = results_3d1_adapted(report_dict, join(hs, "results_3d.png"))
 
 
     # Store the csv with 3D results
@@ -262,6 +263,8 @@ def q_analyze_blur(hs, folder_path, store_summary_dict, report_before_path, repo
     df2.to_csv(store_report_dict)        
     rec_print(report_dict,0)
     
+    return medians_images, medians_detections, deg_results
+
 
 """
 # DO THIS -------------------------------------------------------------------------------------------------

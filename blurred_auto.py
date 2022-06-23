@@ -7,7 +7,7 @@ from initial_quality_project import *
 from detection_pipeline import *
 
 
-def blur_automatic(all_images, filtered_dp_dict, folder_path_in):
+def blur_automatic(all_images, filtered_dp_dict, folder_path_in, info):
     folder_path_out = join(folder_path_in,'blurred/')
     image_blurred_dict = {}
     n=0
@@ -20,8 +20,8 @@ def blur_automatic(all_images, filtered_dp_dict, folder_path_in):
         plate_img, delay_blur, psutil_before, psutil_after = detect_blur(src, filtered_dp_dict[f]['keep'])
         if f=='Image_000071.jpg':
             ii = cv2.cvtColor(plate_img, cv2.COLOR_BGR2RGB)
-            plt.imshow(ii)
-            plt.title('Blurred image')
+            plt.imshow(ii) if info else None
+            plt.title('Blurred image') if info else None
         else:
             None
         n = n+1
