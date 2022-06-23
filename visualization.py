@@ -257,7 +257,8 @@ def deg_of_project(summary_dict, name):
 
 
 # Histogram of percentages of degradation of each parameter of the images
-def degradation_images(summary_dict, name, info):
+def degradation_images(summary_dict, name, xxx):
+
 
     qu_params = ['modeHue','medianSat', 'medianVal', 'avgLy', 'varLy', 'skewness', 'kurtosis', 'asg', 'sobel', 'hough', 'modaLBP', 'entropy']
     qu_params
@@ -278,7 +279,7 @@ def degradation_images(summary_dict, name, info):
     row_old = 0
     col = 0
     colors = ['b', 'k', 'gray', 'y', 'y', 'c', 'c', 'g', 'k', 'r', 'orange', 'magenta']
-    f,a = plt.subplots(4, 3, figsize = (23,15)) if info else None
+    f,a = plt.subplots(4, 3, figsize = (23,15)) if xxx else None, None
     medians_images = []
     for i in range(12):
         p = qu_params[i]
@@ -289,7 +290,7 @@ def degradation_images(summary_dict, name, info):
         
         row_old = row
         values = list(dd[p])
-        if info:
+        if xxx:
             a[row][col].hist(values,align='left', bins = 30, color = colors[i], alpha = 0.7, label = ['Avg = '+ str(np.round(np.mean(values),2))+ '; Var = '+ str(np.round(np.var(values),2))])
             a[row][col].legend()
             a[row][col].set_xlabel("% "+ p)
@@ -298,8 +299,8 @@ def degradation_images(summary_dict, name, info):
             None
         col = col+1
         medians_images.append(np.median(values))
-    plt.suptitle('Histograms of relative degradation of **images**')
-    f.savefig(name)
+    plt.suptitle('Histograms of relative degradation of **images**') if xxx else None
+    f.savefig(name) if xxx else None
 
     return medians_images
 
@@ -326,7 +327,7 @@ def histogram_detections_deg(summary_dict, name, info):
     row_old = 0
     col = 0
     colors = ['b', 'k', 'gray', 'y', 'y', 'c', 'c', 'g', 'k', 'r', 'orange', 'magenta']
-    f,a = plt.subplots(4, 3, figsize = (23,17)) if info else None
+    f,a = plt.subplots(4, 3, figsize = (23,17)) if info else None, None
     medians_detections = []
     for i in range(12):
         p = qu_params[i]
@@ -346,8 +347,8 @@ def histogram_detections_deg(summary_dict, name, info):
             None
         col = col+1
         medians_detections.append(np.median(values))
-    plt.suptitle('Histograms of relative degradation (%) of **detections**')
-    f.savefig(name)
+    plt.suptitle('Histograms of relative degradation (%) of **detections**') if info else None
+    f.savefig(name) if info else None
     return dd, medians_detections
 #dd.corr().style.background_gradient(cmap='viridis').set_precision(2)
 

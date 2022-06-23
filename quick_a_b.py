@@ -4,7 +4,7 @@ from blurred_auto import *
 import pandas as pd
 from xml_files import *
 from visualization import *
-
+import ast
 from matplotlib.pyplot import show, plot
 
 import matplotlib
@@ -123,7 +123,7 @@ def q_analyze_blur(hs, folder_path, store_summary_dict, report_before_path, repo
         for n in range(len(params_images)):
                 p = params_images[n]
                 summary_dict['after']['inputs']['images'][image]['img_char'][p] = img_chars_b[image][n+3]
-    quality_blurred(summary_dict, join(hs, "quality_blurred.png"))
+    #quality_blurred(summary_dict, join(hs, "quality_blurred.png"))
 
 
     
@@ -135,13 +135,13 @@ def q_analyze_blur(hs, folder_path, store_summary_dict, report_before_path, repo
 
     # Evaluate the degradation of the detections !!!!
     dm, medians_detections = histogram_detections_deg(summary_dict, join(hs, "deg_detections.png"), False)
-    dm.corr().style.background_gradient(cmap='viridis').set_precision(2)
+    #dm.corr().style.background_gradient(cmap='viridis').set_precision(2)
 
 
     # Storing the quality parameters, detection and blurring performances and evaluations
     df6 = pd.DataFrame.from_dict(summary_dict) 
-    df6.to_csv(store_summary_dict)        
-    rec_print(summary_dict,0)
+    #df6.to_csv(store_summary_dict)        
+    #rec_print(summary_dict,0)
 
 
     # Create the dictionary
@@ -216,7 +216,7 @@ def q_analyze_blur(hs, folder_path, store_summary_dict, report_before_path, repo
         vv = [100*(float(pdw['before'].values[i])- float(pdw['after'].values[i]) )/ float(pdw['before'].values[i]) for i in range(len(pdw['before']))]
         vv[1] = vv[1]/100
         pdw['degradation_perc'] = vv
-
+        """
         f, a = plt.subplots(1,2, figsize = (27, 4))
         
         m = a[0].bar(pdw.index,pdw['degradation_perc'], alpha = 0.5);
@@ -228,10 +228,10 @@ def q_analyze_blur(hs, folder_path, store_summary_dict, report_before_path, repo
         m[4].set_facecolor('green') if pdw['degradation_perc'][4]>0 else m[4].set_facecolor('red') 
         m[5].set_facecolor('green') if pdw['degradation_perc'][5]>0 else m[5].set_facecolor('red') 
         m[6].set_facecolor('green') if pdw['degradation_perc'][6]<0 else m[6].set_facecolor('red') 
-        """
+        
         m[7].set_facecolor('blue')
         m[8].set_facecolor('blue') 
-        """
+        
         a[0].set_title('Degradation of the 3D model')
         a[0].set_ylabel('% of degradation')
         a[0].set_xlabel('Available parameters')
@@ -240,7 +240,7 @@ def q_analyze_blur(hs, folder_path, store_summary_dict, report_before_path, repo
         for d in pdw['degradation_perc'].values:
             o = o+1
             a[0].text(o,float(d)+np.sign(d),np.round(d,3))
-        """
+        
         a[1].bar(report_dict['CCompare'].keys(), [float(f) for f in report_dict['CCompare'].values()], color='m', alpha = 0.3)
         a[1].set_xlabel('Cloud Compare parameters')
         a[1].set_title('Comparison between original and blurred 3D point clouds')
@@ -250,20 +250,40 @@ def q_analyze_blur(hs, folder_path, store_summary_dict, report_before_path, repo
             a[1].text(j,float(d)+0.03,d)
         """
         print(pdw)
-        print(m)
-        f.savefig(name)
+        #print(m)
+        #f.savefig(name)
         return pdw['degradation_perc']
 
     # Analyze the 3D parameters
-    deg_results = results_3d1_adapted(report_dict, join(hs, "results_3d.png"))
+    deg_results = results_3d1_adapted(report_dict, join(hs, "results_3d.png"));
 
 
     # Store the csv with 3D results
-    df2 = pd.DataFrame.from_dict(report_dict) 
-    df2.to_csv(store_report_dict)        
-    rec_print(report_dict,0)
+    df2 = pd.DataFrame.from_dict(report_dict);
+    #df2.to_csv(store_report_dict)        
+    #rec_print(report_dict,0)
     
     return medians_images, medians_detections, deg_results
+
+
+
+def open_dictionaries(store_summary_dict, store_report_dict):
+    df_summary = pd.read_csv(store_summary_dict, index_col=0)
+
+    summary_dict = {}
+    summary_dict['folder_name'] = df_summary.folder_name.values[0]
+    summary_dict['n_imgs'] = df_summary.n_imgs.values[0]
+    summary_dict['before'] = {}
+    summary_dict['before']['inputs'] = ast.literal_eval(df_summary.before.values[0])
+
+    summary_dict['after'] = {}
+    summary_dict['after']['inputs'] = ast.literal_eval(df_summary.after.values[0])
+
+
+    # Open the report
+    df_report = pd.read_csv(store_report_dict,index_col=0)
+    report_dict = df_report.to_dict()
+    return summary_dict, report_dict
 
 
 """

@@ -153,16 +153,15 @@ def project_description(folder_path, all_images, show=True, x =" ", info = True)
         for c, p in zip(col, patches):
             plt.setp(p, 'facecolor', cm3(c))
         ax[3].set_title("Entropies histogram")
-        
-        varmodeHue = np.var(mode_hues)
-        varavgLys = np.var(avgLys)
-        varHough = np.var(houghs)
-        varEntropy = np.var(entropies)
-        #print(varmodeHue, varavgLys, varHough, varEntropy)
+
         fig.savefig(x)
     else:
         None
-    
+    varmodeHue = np.var(mode_hues)
+    varavgLys = np.var(avgLys)
+    varHough = np.var(houghs)
+    varEntropy = np.var(entropies)
+    #print(varmodeHue, varavgLys, varHough, varEntropy)
     return (varmodeHue, varavgLys, varHough, varEntropy, img_chars)
     
 
