@@ -10,7 +10,7 @@ from matplotlib.pyplot import show, plot
 import matplotlib
 #matplotlib.use('Agg')
 
-def q_analyze_blur(hs, folder_path, store_summary_dict, report_before_path, report_after_path, store_report_dict):
+def q_analyze_blur(hs, folder_path, report_before_path, report_after_path):
         
     # Create and empty dictionary for all the and results, create list of quality parameters
     summary_dict = {}
@@ -20,7 +20,7 @@ def q_analyze_blur(hs, folder_path, store_summary_dict, report_before_path, repo
 
     # Initial checks to see the state of the folder
     print('Initial folder checks')
-    f_exists, isempty, n_images, shape_images, all_images = initial_checks_func(folder_path, 5); #its the percentage of images you want
+    f_exists, isempty, n_images, shape_images, all_images = initial_checks_func(folder_path, 10); #its the percentage of images you want
 
     summary_dict['n_imgs'] = n_images
     summary_dict['before'] = {}
@@ -212,7 +212,7 @@ def q_analyze_blur(hs, folder_path, store_summary_dict, report_before_path, repo
 
     
         pdw = dx.loc[pp]
-        print(pdw)
+        #print(pdw)
         vv = [100*(float(pdw['before'].values[i])- float(pdw['after'].values[i]) )/ float(pdw['before'].values[i]) for i in range(len(pdw['before']))]
         vv[1] = vv[1]/100
         pdw['degradation_perc'] = vv

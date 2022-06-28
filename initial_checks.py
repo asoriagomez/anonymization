@@ -5,10 +5,10 @@ from os import listdir
 from os.path import isfile, join
 import cv2
 import random
-
+import numpy as np
 import matplotlib.pyplot as plt
 
-def initial_checks_func(folder_path, percentage=10):
+def initial_checks_func(folder_path, percentage=40):
 
     # Check folder exists
     f_exists = path.exists(folder_path)
@@ -23,7 +23,7 @@ def initial_checks_func(folder_path, percentage=10):
 
     nget = int(len(all_images1)*percentage/100)
     all_images = random.sample(all_images1, nget)
-    all_images.append('Image_000071.jpg')
+    """all_images.append('Image_000071.jpg')"""
 
     # Number of images
     print('N images ',len(all_images))
@@ -33,14 +33,14 @@ def initial_checks_func(folder_path, percentage=10):
     for i in all_images:
         image_path = join(folder_path, i)
         image = cv2.imread(image_path)
-        
+        """ 
         if i=='Image_000071.jpg':
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             plt.imshow(image)
             plt.title('Example image of the project')
         else:
             None
-        
+        """
         n = n+1
         #print(image.shape) # if you are curious of all the images
     len_allimages = len(all_images)

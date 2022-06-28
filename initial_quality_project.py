@@ -82,12 +82,12 @@ def project_description(folder_path, all_images, show=True, x =" ", info = True)
     v=False
     for f in all_images:
         #print(n)
-        
+        """
         if f=='Image_000071.jpg':
             v=True if info else False
         else:
             v=False
-        
+        """
         n = n+1
         #print(f)
         filename = join(folder_path, f)
