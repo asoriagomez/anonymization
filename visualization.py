@@ -237,7 +237,7 @@ def deg_of_project(summary_dict, name):
     pars.remove('images')
     deltas = []
     for p in pars:
-        delta = 100%(summary_dict['before']['inputs'][p] - summary_dict['after']['inputs'][p])/summary_dict['before']['inputs'][p]
+        delta = 100*(summary_dict['before']['inputs'][p] - summary_dict['after']['inputs'][p])/summary_dict['before']['inputs'][p]
         deltas.append(delta)
     fig1, ax1 = plt.subplots()
     fig1.set_figheight(5)
@@ -269,7 +269,10 @@ def degradation_images(summary_dict, name, xxx):
     for img in summary_dict['before']['inputs']['images']:
         for q in qu_params:
             diff = summary_dict['before']['inputs']['images'][img]['img_char'][q]-summary_dict['after']['inputs']['images'][img]['img_char'][q]
-            perc = 100*diff/(summary_dict['before']['inputs']['images'][img]['img_char'][q])
+            if summary_dict['before']['inputs']['images'][img]['img_char'][q] == 0:
+                perc = 0.01
+            else:
+                perc = 100*diff/(summary_dict['before']['inputs']['images'][img]['img_char'][q])
             info[q].append(perc)
 
     dd = pd.DataFrame(info)
@@ -279,7 +282,8 @@ def degradation_images(summary_dict, name, xxx):
     row_old = 0
     col = 0
     colors = ['b', 'k', 'gray', 'y', 'y', 'c', 'c', 'g', 'k', 'r', 'orange', 'magenta']
-    f,a = plt.subplots(4, 3, figsize = (23,15)) if xxx else None, None
+    f,a = plt.subplots(4, 3, figsize = (23,15)) #if xxx else None, None
+    
     medians_images = []
     for i in range(12):
         p = qu_params[i]
@@ -299,7 +303,7 @@ def degradation_images(summary_dict, name, xxx):
             None
         col = col+1
         medians_images.append(np.median(values))
-    plt.suptitle('Histograms of relative degradation of **images**') if xxx else None
+    plt.suptitle('Histograms of relative degradation of **images**') #if xxx else None
     f.savefig(name) if xxx else None
 
     return medians_images
@@ -327,7 +331,7 @@ def histogram_detections_deg(summary_dict, name, info):
     row_old = 0
     col = 0
     colors = ['b', 'k', 'gray', 'y', 'y', 'c', 'c', 'g', 'k', 'r', 'orange', 'magenta']
-    f,a = plt.subplots(4, 3, figsize = (23,17)) if info else None, None
+    f,a = plt.subplots(4, 3, figsize = (23,17)) # if info else None, None
     medians_detections = []
     for i in range(12):
         p = qu_params[i]

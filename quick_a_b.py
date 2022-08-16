@@ -1,3 +1,4 @@
+from numpy import True_
 from detection_pipeline import *
 from initial_quality_project import *
 from blurred_auto import *
@@ -10,7 +11,7 @@ from matplotlib.pyplot import show, plot
 import matplotlib
 #matplotlib.use('Agg')
 
-def q_analyze_blur(hs, folder_path, report_before_path, report_after_path):
+def q_analyze_blur(hs, folder_path, report_before_path, report_after_path, percentage):
         
     # Create and empty dictionary for all the and results, create list of quality parameters
     summary_dict = {}
@@ -20,7 +21,7 @@ def q_analyze_blur(hs, folder_path, report_before_path, report_after_path):
 
     # Initial checks to see the state of the folder
     print('Initial folder checks')
-    f_exists, isempty, n_images, shape_images, all_images = initial_checks_func(folder_path, 10); #its the percentage of images you want
+    f_exists, isempty, n_images, shape_images, all_images = initial_checks_func(folder_path, percentage); #its the percentage of images you want
 
     summary_dict['n_imgs'] = n_images
     summary_dict['before'] = {}
@@ -44,7 +45,7 @@ def q_analyze_blur(hs, folder_path, report_before_path, report_after_path):
         for n in range(len(params_images)):
             p = params_images[n]
             summary_dict['before']['inputs']['images'][image]['img_char'][p] = img_chars[image][n+3]
-    #quality_images(summary_dict,join(hs,"img_quality.png"));
+    quality_images(summary_dict,join(hs,"img_quality.png"));
 
 
     # Run detection algorithm
@@ -77,8 +78,8 @@ def q_analyze_blur(hs, folder_path, report_before_path, report_after_path):
 
     
     # Evaluate the quality of the detections
-    #dd=histogram_detections(summary_dict, join(hs, "hist_det.png"))
-    #dd.corr().style.background_gradient(cmap='coolwarm').set_precision(2)
+    dd=histogram_detections(summary_dict, join(hs, "hist_det.png"))
+    dd.corr().style.background_gradient(cmap='coolwarm').set_precision(2)
     
 
     # Run blurring algorithm
@@ -123,24 +124,26 @@ def q_analyze_blur(hs, folder_path, report_before_path, report_after_path):
         for n in range(len(params_images)):
                 p = params_images[n]
                 summary_dict['after']['inputs']['images'][image]['img_char'][p] = img_chars_b[image][n+3]
-    #quality_blurred(summary_dict, join(hs, "quality_blurred.png"))
+    quality_blurred(summary_dict, join(hs, "quality_blurred.png"))
 
 
     
     # Evaluate the degradation of the whole project
-    #deg_of_project(summary_dict, join(hs, "deg_proj.png"))
+    deg_of_project(summary_dict, join(hs, "deg_proj.png"))
 
     # Evaluate the degradation of the images
-    medians_images = degradation_images(summary_dict, join(hs, "deg_imgs.png"), False)
+    medians_images = degradation_images(summary_dict, join(hs, "deg_imgs.png"), True)
 
     # Evaluate the degradation of the detections !!!!
-    dm, medians_detections = histogram_detections_deg(summary_dict, join(hs, "deg_detections.png"), False)
-    #dm.corr().style.background_gradient(cmap='viridis').set_precision(2)
+    dm, medians_detections = histogram_detections_deg(summary_dict, join(hs, "deg_detections.png"), True)
+    dm.corr().style.background_gradient(cmap='viridis').set_precision(2)
 
 
     # Storing the quality parameters, detection and blurring performances and evaluations
     df6 = pd.DataFrame.from_dict(summary_dict) 
-    #df6.to_csv(store_summary_dict)        
+    store_summary_dict = join(hs,'summary_project.csv')
+
+    df6.to_csv(store_summary_dict)        
     #rec_print(summary_dict,0)
 
 
@@ -159,7 +162,8 @@ def q_analyze_blur(hs, folder_path, report_before_path, report_after_path):
     report_dict['CCompare'] = {}
 
     # Define the parameters that ought to be found
-    params_cloud = ['n_calibrated', 'GSD', 'optim', '2D_BBA', '3D_BBA', 'keypoints_img', 'matches_img', 'mre']
+    params_cloud = ['n_calibrated','optim', '2D_BBA', '3D_BBA', 'keypoints_img', 'matches_img', 'mre']
+    # 'GSD', 
     params_matic = ['dMTP1-2', 'dMTP1-3']
     params_cc = ['RMS_register', 'avg_dist', 'sigma']
 
@@ -177,14 +181,17 @@ def q_analyze_blur(hs, folder_path, report_before_path, report_after_path):
         report_dict['before']['Cloud4D'][x] = results_before_cloud[n]
         report_dict['after']['Cloud4D'][x] = results_after_cloud[n]
         n+=1
-    """
-    for x in params_matic:
-        report_dict['before']['Matic4D'][x] = input(x+' before:')
-        report_dict['after']['Matic4D'][x] = input(x+' after:')
 
+    br = 0
+    for x in params_matic:
+        report_dict['before']['Matic4D'][x] = "1.3"#input(x+' before:')
+        report_dict['after']['Matic4D'][x] = "1.3"#input(x+' after:')
+        br+=1
+        
+    mz = 0
     for x in params_cc:
-        report_dict['CCompare'][x] = input(x)
-    """
+        report_dict['CCompare'][x] = "1"#input(x)
+        mz+=1
 
     # 3D results
     def results_3d1_adapted(report_dict, name):
@@ -216,7 +223,7 @@ def q_analyze_blur(hs, folder_path, report_before_path, report_after_path):
         vv = [100*(float(pdw['before'].values[i])- float(pdw['after'].values[i]) )/ float(pdw['before'].values[i]) for i in range(len(pdw['before']))]
         vv[1] = vv[1]/100
         pdw['degradation_perc'] = vv
-        """
+        
         f, a = plt.subplots(1,2, figsize = (27, 4))
         
         m = a[0].bar(pdw.index,pdw['degradation_perc'], alpha = 0.5);
@@ -248,10 +255,11 @@ def q_analyze_blur(hs, folder_path, report_before_path, report_after_path):
         for d in report_dict['CCompare'].values():
             j = j+1
             a[1].text(j,float(d)+0.03,d)
-        """
+        
         print(pdw)
-        #print(m)
-        #f.savefig(name)
+        print(m)
+        f.savefig(name)
+        plt.show()
         return pdw['degradation_perc']
 
     # Analyze the 3D parameters
@@ -260,7 +268,8 @@ def q_analyze_blur(hs, folder_path, report_before_path, report_after_path):
 
     # Store the csv with 3D results
     df2 = pd.DataFrame.from_dict(report_dict);
-    #df2.to_csv(store_report_dict)        
+    store_report_dict = join(hs,'report_dict.csv')
+    df2.to_csv(store_report_dict)        
     #rec_print(report_dict,0)
     
     return medians_images, medians_detections, deg_results
